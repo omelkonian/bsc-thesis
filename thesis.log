@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.1415926-2.5-0.9999.3 (TeX Live 2013/Debian) (format=xelatex 2016.1.11)  16 FEB 2016 15:55
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2015.12.28)  14 MAR 2016 16:54
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -11,15 +11,15 @@ Document Class: report 2007/10/19 v1.4h Standard LaTeX document class
 (/usr/share/texlive/texmf-dist/tex/latex/base/size10.clo
 File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
 )
-\c@part=\count80
-\c@chapter=\count81
-\c@section=\count82
-\c@subsection=\count83
-\c@subsubsection=\count84
-\c@paragraph=\count85
-\c@subparagraph=\count86
-\c@figure=\count87
-\c@table=\count88
+\c@part=\count79
+\c@chapter=\count80
+\c@section=\count81
+\c@subsection=\count82
+\c@subsubsection=\count83
+\c@paragraph=\count84
+\c@subparagraph=\count85
+\c@figure=\count86
+\c@table=\count87
 \abovecaptionskip=\skip41
 \belowcaptionskip=\skip42
 \bibindent=\dimen102
@@ -51,7 +51,8 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 8.
  [1
 
-] [1] (./thesis.toc)
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] [1]
+(./thesis.toc)
 \tf@toc=\write3
 \openout3 = `thesis.toc'.
 
@@ -67,17 +68,51 @@ Chapter 2.
 
 ]
 Chapter 3.
-No file thesis.bbl.
 [4
+
+]
+Chapter 4.
+[5
+
+]
+Chapter 5.
+[6
+
+]
+Chapter 6.
+[7
+
+]
+Chapter 7.
+[8
+
+]
+Chapter 8.
+[9
+
+]
+Chapter 9.
+No file thesis.bbl.
+[10
 
 ] (./thesis.aux) ) 
 Here is how much of TeX's memory you used:
- 254 strings out of 493918
- 2613 string characters out of 6150563
- 52172 words of memory out of 5000000
- 3650 multiletter control sequences out of 15000+600000
+ 256 strings out of 493304
+ 2714 string characters out of 6139870
+ 52880 words of memory out of 5000000
+ 3786 multiletter control sequences out of 15000+600000
  8195 words of font info for 29 fonts, out of 8000000 for 9000
- 1144 hyphenation exceptions out of 8191
+ 957 hyphenation exceptions out of 8191
  23i,6n,17p,137b,179s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm
+/cmbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx1
+2.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><
+/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/sh
+are/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb>
+Output written on thesis.pdf (12 pages, 78824 bytes).
+PDF statistics:
+ 63 PDF objects out of 1000 (max. 8388607)
+ 43 compressed objects within 1 object stream
+ 0 named destinations out of 1000 (max. 500000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
-Output written on thesis.pdf (6 pages).
