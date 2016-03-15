@@ -1,97 +1,165 @@
-\documentclass[a4]{report}
+\documentclass{dithesis}
+\usepackage{mathspec}
+\usepackage{xgreek}
+\usepackage{xunicode}
+\usepackage[polutonikogreek,english]{babel}
+
+\setallmainfonts[Mapping=tex-text]{Arial}
+\setallsansfonts[Mapping=tex-text]{Arial}
+\setallmonofonts[Mapping=tex-text]{Arial}
+
+\renewcommand{\university}{National and Kapodistrian University of Athens}
+\renewcommand{\school}{Faculty of Exact Sciences}
+\renewcommand{\department}{Department of Informatics and Telecommunications}
+
+\renewcommand{\thesisplace}{Athens}
+\renewcommand{\thesisdate}{April 2016}
+
+\renewcommand{\thesislabel}{Bachelor Thesis}
+\renewcommand{\supervisorlabel}{Supervisors}
+\renewcommand{\idlabel}{Α.Μ.}
+
+\renewcommand{\contentsname}{Contents}
+\renewcommand{\listfigurename}{List of Figures\vspace{5 mm}}
+\renewcommand{\figurename}{Figure}
+\renewcommand{\listtablename}{List of Tables\vspace{5 mm}}
+\renewcommand{\tablename}{Table}
+
 
 \begin{document}
 
-\title{RHEA: A Reactive, Holistic, Extensible, Abstract Framework for Dataflow Programming}
-\author{Orestis Melkonian}
-
+\thesistitle{RHEA: A Reactive, Holistic, Extensible, Abstract Framework for Dataflow Programming}
+\thesisauthor{Orestis Melkonian}{1115201000128}
+\supervisor{Panos Rondogiannis}{Professor EKPA}
+\supervisor{Angelos Charalambidis}{Researcher NCSR}
 \maketitle
 
-\begin{abstract}
-Summary
+\begin{thesisabstract}[Abstract]
+Summary here
 
-Subject areas
-Keywords
-\end{abstract}
+\thesiskeywords
+{Subject Areas}
+	{Dataflow programming, Stream Processing}
+{Keywords}
+	{\LaTeX{}}{Κλάσσεις Εγγράφων}{Πτυχιακές Εργασίες}{Τμήμα Πληροφορικής και Τηλεπικοινωνιών}{Πανεπιστήμιο Αθηνών}
+\end{thesisabstract}
 
-\chapter{Acknowledgements}
+\begin{thesisdedication}
+"{\selectlanguage{polutonikogreek}τὰ όντα ιέναι τε πάντα καὶ μένειν ουδέν}" \\
+(all entities move and nothing remains still) \\
+- Heraclitus
+\end{thesisdedication}
+
+\begin{thesisacknowledgments}[Acknowledgements]
+I would like to thank Angelos Charalambidis for his immensely helpful supervision and guidance throughout the whole period of 6 months that I was present in NCSR. \\
+I would also like to thank Professor Panos Randogiannis for being a major influence in my current research interests through the undergraduate courses "Theory of Computation" and "Principles of Programming Languages", which cultivated a certain appeal to declarative languages, formal methods and generally abstraction.
+\end{thesisacknowledgments}
 
 \tableofcontents
+\listoffigures
+\listoftables
 
-\chapter{Prologue}
-My background
-NCSR internship <-> RoboSkel
+\begin{thesisprologue}[Prologue]
+This bachelor project is a continuation of my internship at the National Centre for Scientific Research "Demokritos", particularly in the Software and Knowledge Engineering Laboratory (SKEL). \\
+The main task I was assigned was the implementation of a framework for robot programming using a dataflow approach. During that internship, I came to realize that my work could be easily generalized to cover a much broader application area than just robot software.
+\end{thesisprologue}
 
-\chapter{Introduction}
+\thesissection{Introduction}
 
-Motivation
-	Functional Programming	
-	Declarative languages
-	Abstraction as a solution to complexity 
-	Decouple Data from Computation	
+\thesissubsection{Motivation}
+\thesissubsubsection{Declarative languages}
+\thesissubsubsection{Abstraction as a mean to overcome complexity}	
+\thesissubsubsection{Data versus Computation}			
 
-Robotics -> Dataflow
+\thesissubsection{Dataflows in Robotics}
+\thesissubsection{Dataflows in Big Data}
 
-Big-data -> Dataflows
-
-Structure of thesis
-
-
-\chapter{Background}
-
-FRP
-Dataflow
-Stream processing
-Flow-based programming
-Robotics
+\thesissubsection{Structure}
 
 
-\chapter{Approach}
+\thesissection{Background}
 
-Generality
-Extensibility (Evaluation + Distribution)
-ReactiveStreams
-
-
-\chapter{Implementation}
-
-General Documentation
-
-\chapter{Deployment}
+\thesissubsection{Functional Reactive Programming}
+\thesissubsection{The Dataflow Computational Model}
+\thesissubsection{Stream processing}
+\thesissubsection{Flow-based programming}
+\thesissubsection{Model-driven architecture}
+\thesissubsection{Robotics}
 
 
-\chapter{Optimization}
+\thesissection{Approach}
+
+\thesissubsection{Generality}
+\thesissubsection{Extensibility (Evaluation + Distribution)}
+\thesissubsection{The Reactive Streams Standard}
+
+
+\thesissection{Implementation}
+
+\thesissubsection{General Documentation}
+
+
+\thesissection{Deployment}
+
+
+\thesissection{Optimization}
+
+
+\thesissection{Use-cases}
+
+\thesissubsection{Robot Hospital Guide}
+\thesissubsection{Robot Control Panel}
+\thesissubsection{Camera Surveilance}
+\thesissubsection{Hamming Numbers}
+
+\thesissection{Related Work}
+
+\thesissubsection{GoogleDataflow}
+\thesissubsection{TensorFlow}
+\thesissubsection{Akka}
+\thesissubsection{dispel4py}
+\thesissubsection{Flowstone}
+\thesissubsection{Spark}
+\thesissubsection{Naiad}
+\thesissubsection{NoFlo}
+
+\thesissection{Future Work}
+
+
+\thesissection{Conclusions}
 
 
 
-\chapter{Use-cases}
+\begin{thesisterminology}
+A table of used scientific terms follows.
 
-Robot Hospital Guide
-Robot Control Panel
-Camera Surveilance
+\begin{tabularx}{\textwidth}{|X|X|}
+  \hline
+  κλάσση     & class \\
+  \hline
+  εντολή     & command \\
+  \hline
+  περιβάλλον & environment \\
+  \hline
+\end{tabularx}
+
+\end{thesisterminology}
+
+\begin{thesisabbreviations}
+A table of all abbrevations used throughout the thesis follows ~\cite{small}.
+
+\begin{tabularx}{\textwidth}{|X|X|}
+  \hline
+  FRP & Functional Reactive Programming \\
+  \hline
+\end{tabularx}
+
+\end{thesisabbreviations}
+
+\bibliography{thesis}{}
+\bibliographystyle{ieeetr}
 
 
-\chapter{Related Work}
-
-GoogleDataflow
-TensorFlow
-Akka
-dispel4py
-Flowstone
-Spark
-Naiad
-NoFlo
-
-
-\chapter{Figures, Tables}
-
-
-\chapter{Conclusions}
-
-
-
-\bibliographystyle{plain}
-\bibliography{thesis}
 
 
 
