@@ -2,19 +2,29 @@
 \usepackage{mathspec}
 \usepackage{xgreek}
 \usepackage{xunicode}
-\usepackage[polutonikogreek,english]{babel}
+
+% Number sets
+\usepackage{amsfonts}
+
+% Tikz
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usepackage{caption}
+
+% Code
+\usepackage{listings}
+\usepackage{minted}
 
 \setallmainfonts[Mapping=tex-text]{Arial}
 \setallsansfonts[Mapping=tex-text]{Arial}
 \setallmonofonts[Mapping=tex-text]{Arial}
 
+
 \renewcommand{\university}{National and Kapodistrian University of Athens}
 \renewcommand{\school}{Faculty of Exact Sciences}
 \renewcommand{\department}{Department of Informatics and Telecommunications}
-
 \renewcommand{\thesisplace}{Athens}
 \renewcommand{\thesisdate}{April 2016}
-
 \renewcommand{\thesislabel}{Bachelor Thesis}
 \renewcommand{\supervisorlabel}{Supervisors}
 \renewcommand{\idlabel}{Α.Μ.}
@@ -24,11 +34,11 @@
 \renewcommand{\figurename}{Figure}
 \renewcommand{\listtablename}{List of Tables\vspace{5 mm}}
 \renewcommand{\tablename}{Table}
+\renewcommand{\refname}{References}
 
 
 \begin{document}
-
-\thesistitle{RHEA: A Reactive, Holistic, Extensible, Abstract Framework for Dataflow Programming}
+\thesistitle{RHEA: A Reactive, Heterogeneous, Extensible and Abstract Framework for Dataflow Programming}
 \thesisauthor{Orestis Melkonian}{1115201000128}
 \supervisor{Panos Rondogiannis}{Professor EKPA}
 \supervisor{Angelos Charalambidis}{Researcher NCSR}
@@ -38,79 +48,162 @@
 Summary here
 
 \thesiskeywords
-{Subject Areas}
-	{Dataflow programming, Stream Processing}
+{Subject Area}{Programming Languages}
 {Keywords}
-	{\LaTeX{}}{Κλάσσεις Εγγράφων}{Πτυχιακές Εργασίες}{Τμήμα Πληροφορικής και Τηλεπικοινωνιών}{Πανεπιστήμιο Αθηνών}
+	{dataflow}
+	{stream}
+	{frp}
+	{distributed systems}
+	{model-driven architecture}
+	{program synthesis}
+	{declarative languages}
+	{node placement}
 \end{thesisabstract}
 
 \begin{thesisdedication}
-"{\selectlanguage{polutonikogreek}τὰ όντα ιέναι τε πάντα καὶ μένειν ουδέν}" \\
+"τὰ όντα ιέναι τε πάντα καὶ μένειν ουδέν" \\
 (all entities move and nothing remains still) \\
 - Heraclitus
 \end{thesisdedication}
 
 \begin{thesisacknowledgments}[Acknowledgements]
-I would like to thank Angelos Charalambidis for his immensely helpful supervision and guidance throughout the whole period of 6 months that I was present in NCSR. \\
-I would also like to thank Professor Panos Randogiannis for being a major influence in my current research interests through the undergraduate courses "Theory of Computation" and "Principles of Programming Languages", which cultivated a certain appeal to declarative languages, formal methods and generally abstraction.
+
+I would like to thank Angelos Charalambidis for his immensely helpful supervision and guidance throughout the whole period of 6 months that I was present in NCSR. 
+
+I would also like to thank Professor Panos Randogiannis for being a major influence in my current research interests through the undergraduate courses "Theory of Computation" and "Principles of Programming Languages", where I was introduced to a much more declarative way of programming and started appreciating mathematical sensibility in computing.
+
 \end{thesisacknowledgments}
 
 \tableofcontents
 \listoffigures
-\listoftables
 
 \begin{thesisprologue}[Prologue]
-This bachelor project is a continuation of my internship at the National Centre for Scientific Research "Demokritos", particularly in the Software and Knowledge Engineering Laboratory (SKEL). \\
-The main task I was assigned was the implementation of a framework for robot programming using a dataflow approach. During that internship, I came to realize that my work could be easily generalized to cover a much broader application area than just robot software.
+
+This bachelor thesis is a continuation of my internship at the National Centre for Scientific Research "Demokritos", particularly in the Software and Knowledge Engineering Laboratory (SKEL). 
+
+The main task I was assigned was the implementation of a framework for robot programming using a dataflow approach. During that internship, I came to realize that my work could be easily generalized to cover a much broader application area than just robot software. 
+
+The name of the framework stems from the ancient Greek Titaness Rhea(\textit{Ρέα}), daughter of earth goddess Gaia(\textit{Γαία}) and sky god Uranus(\textit{Ουρανός}) and etymologically derives from the verb \textit{ρέω}(to flow).
+
 \end{thesisprologue}
+
 
 \thesissection{Introduction}
 
+\thesissubsection{Main concept}
+
+My main contribution is the design and implementation of a framework for dataflow programming to be deployed anywhere, ranging from low-performance robots and sensors to clusters of computer and even the Cloud. 
+
+The main idea is to provide the programmer with a different execution model, the dataflow model, which allows for a more abstract way of thinking and has the advantage of exposing opportunities for parallelism (amongst CPU cores) and distribution (amongst computational machines) that the "intelligent" underlying system can automatically realize. Therefore, the programmer will be able to gain good performance and utilization of the available computational resources, while at the same time reducing development time and cost and maintaining a much cleaner and easier-to-refactor software system.
+
+
 \thesissubsection{Motivation}
+
 \thesissubsubsection{Declarative languages}
-\thesissubsubsection{Abstraction as a mean to overcome complexity}	
+
+Software is becoming increasingly more complex each year, as computing capabilities are strengthened and user needs become more and more demanding. Thus the need for higher abstraction becomes mandatory, as it provides a more structured, easier to debug and maintainable way of developing software. In other words, abstraction in computer science acts as a mean to overcome complexity. 
+
+In programming languages, the level of the aforementioned abstraction is measured regarding the amount of low-level details a programmer has to specify. Therefore, languages can be divided in two categories: the imperative ones, which specify what needs to be done and how to do it, and the declarative ones, which only specify what needs to be done and rely on the underlying compiler/interpreter to produce the exact commands that will realize the desired behaviour. The most well-known declarative programming paradigms are functional and logic programming, each providing higher abstraction in different aspects. My approach was greatly influenced by the functional paradigm.
 \thesissubsubsection{Data versus Computation}			
 
-\thesissubsection{Dataflows in Robotics}
-\thesissubsection{Dataflows in Big Data}
+\thesissubsubsection{Dataflows in Robotics}
+\thesissubsubsection{Dataflows in Internet of Things}
+\thesissubsubsection{Dataflows in Big Data}
 
-\thesissubsection{Structure}
 
+\thesissubsection{Outline}
+
+There are nine chapters which compose this thesis: \textit{Introduction, Background, Approach, Implementation, Applications, Related Work, Future Work, Conclusions}.
+
+\textit{Background} introduces the reader to basic background knowledge, necessary for complete understanding.
+
+\textit{Approach} presents the main characteristics of my approach.
+
+\textit{Implementation} gives a more detailed specification of the framework.
+
+\textit{Applications} present some use-cases, ranging from general mathematical problems to real-life robot scenarios.
+
+\textit{Related Work} discusses relevant concepts and technologies, which influenced major decisions concerning the design and implementation of the framework.
+
+\textit{Future Work} suggests some interesting topics for future research, whose embedding in the framework is meaningful.
+
+\textit{Conclusions} sums up.
 
 \thesissection{Background}
 
-\thesissubsection{Functional Reactive Programming}
-\thesissubsection{The Dataflow Computational Model}
-\thesissubsection{Stream processing}
-\thesissubsection{Flow-based programming}
-\thesissubsection{Model-driven architecture}
-\thesissubsection{Robotics}
+\thesissubsection{The dataflow computational model}
+The increased interest in parallelism during the 70's gave rise to the dataflow execution model, which is an alternative to the classical "von-Neumann" model. In the dataflow model, everything is represented in a dataflow graph, where nodes are independent computational units  and edges are communication channels between these units. A node/unit is fired immediately when its required inputs are available and therefore no explicit control commands are needed for execution. Figure 1 shows a dataflow graph enumerating the set $\mathbb{N}$ of natural numbers.
 
+\begin{figure}[h!] \begin{center} 
+	\input{diagrams/nat.tikz}	
+	\caption{Natural numbers}
+\end{center} \end{figure}
+
+
+The main advantage of the dataflow model is its implicit parallelism, deriving from the fact that the computational units are totally independent and therefore can be executed in parallel. The communication can either be an in-memory data storage or even a TCP connection across the network. Its great flexibility and composability make it a good candidate for the underlying architecture of a framework with a high level of abstraction.
+
+\thesissubsection{Functional reactive programming}
+A relatively recent model of programming is Functional Reactive Programming (FRP), which provides a conceptual framework for implementing reactive(i.e. time-varying and responding to external stimuli) behaviour in \textit{hybrid systems} (i.e. containing both continuous and discrete components), such as robots, in functional programming languages. It first appeared as a composable library for graphic animations (cite FRAN), but quickly evolved into a generic paradigm (cite Yale papers). \\
+Although appealing at first, FRP was not appropriate for systems  with real-time constraints (cite EventFRP), due to uncontrollable time- and space- leaks. The solution was a generalization of monads called \textit{arrows} (cite Hughes), which provided the necessary guarantees that the aforementioned common errors do not occur. Let's see the example of calculating a robot's x-coordinate. Here is the mathematical formula drawn from control theory:
+
+$$ x = 1/2 \int (vr + vl) \cos\theta $$ 
+
+Below is the FRP code corresponding to the formula above:
+
+\newmintedfile[hs]{hs}{frame=lines}
+\hs{code/frp1.hs}
+
+As the above may seem counter-intuitive, a new notation was conceived, notably the \textit{arrow notation} (cite arrow notation):
+
+\hs{code/frp2.hs}
+
+The main advantages of FRP are its close correspondence to mathematics, which make it an ideal framework for modelling real-time systems, and its concise representation of time-varying values via \textit{signals}. \\
+For a more detailed view of the FRP idiom and all of its variants please see the literature (cite Push/Pull, RealTimeFRP, Yampa).
+
+\thesissubsection{Publish-Subscribe model}
+
+\textit{Publish/Subscribe}(PubSub) is a communication paradigm that became popular due to the loose coupling of its components, suited for the most recent large-scale distributed applications.
+
+There is no point-to-point communication and no synchronization. \textit{Publishers} advertise messages of a given type to a specific message class or \textit{topic} that is identified by a \textit{keyword}, whereas \textit{subscribers} listen on a specific \textit{topic} without any knowledge of who the publishers are. The component responsible for relaying the messages between machines and/or processes and finding the cheaper dissemination method is called \textit{message broker}. Figure 2 is an abstract graphical representation of the PubSub model.
+
+\begin{figure}[h!] \begin{center}    
+  	\input{diagrams/pubsub.tikz} 
+  	\caption{PubSub typical layout}
+\end{center} \end{figure}
+
+\thesissubsection{ROS: Robot Operating System}
+
+ROS is an open-source middleware for robot software, which emphasizes large-scale integrative robotics research(cite ROS). It provides a \textit{thin} communication layer between heterogeneous computers, from robots to mainframes and tt has been widely adopted by the research community around the world, due to its flexibility and maximal support of reusability through packaging and composability. It provides a nice solution to the development complexity introduced by complex robot applications that consist of several modules and require different device drivers for each individual robot. 
+
+It follows a peer-to-peer network topology, implemented using a topic-based PubSub messaging protocol and its architecture reflects many sound design principles. Another great property of ROS is that it is language-agnostic, meaning that only a minimal specification language for message transaction has been defined, so contributors are free to implement small clients in different clients.
+
+A typical development scenario is to write several \textit{nodes}, that subscribe to some topics
+\thesissubsection{Internet of things}
 
 \thesissection{Approach}
 
-\thesissubsection{Generality}
-\thesissubsection{Extensibility (Evaluation + Distribution)}
-\thesissubsection{The Reactive Streams Standard}
-
+\thesissubsection{Reactive}
+\thesissubsection{Heterogeneous}
+\thesissubsection{Extensible}
+\thesissubsection{Abstract}
 
 \thesissection{Implementation}
 
-\thesissubsection{General Documentation}
+\thesissubsection{The Reactive Streams Standard}
+\thesissubsection{Stream variables}
+\thesissubsection{Stream operators}
+\thesissubsection{Deployment}
+\thesissubsection{Optimization}
+\thesissubsubsection{Heuristic-based graph transformations}
+\thesissubsubsection{Network-aware node placement}
+\thesissubsection{Serialization}
 
+\thesissection{Applications}
 
-\thesissection{Deployment}
-
-
-\thesissection{Optimization}
-
-
-\thesissection{Use-cases}
-
-\thesissubsection{Robot Hospital Guide}
-\thesissubsection{Robot Control Panel}
-\thesissubsection{Camera Surveilance}
-\thesissubsection{Hamming Numbers}
+\thesissubsection{Hamming numbers}
+\thesissubsection{Camera surveilance}
+\thesissubsection{Robot control panel}
+\thesissubsection{Robot hospital guide}
 
 \thesissection{Related Work}
 
@@ -122,45 +215,55 @@ The main task I was assigned was the implementation of a framework for robot pro
 \thesissubsection{Spark}
 \thesissubsection{Naiad}
 \thesissubsection{NoFlo}
+\thesissubsection{NodeRed}
+\thesissubsection{Yampa}
 
 \thesissection{Future Work}
 
+\thesissubsection{More evaluation strategies}
+\thesissubsection{Dynamic reconfiguration}
+\thesissubsection{Advanced network profiling}
+\thesissubsection{Integration with other technologies}
+\thesissubsection{Domain-specific operators}
+\thesissubsection{Stream reasoning}
 
 \thesissection{Conclusions}
-
-
 
 \begin{thesisterminology}
 A table of used scientific terms follows.
 
 \begin{tabularx}{\textwidth}{|X|X|}
   \hline
-  κλάσση     & class \\
+  κλάσση & class \\
   \hline
-  εντολή     & command \\
+  εντολή & command \\
   \hline
   περιβάλλον & environment \\
   \hline
-\end{tabularx}
-
+\end{tabularx} 
 \end{thesisterminology}
 
 \begin{thesisabbreviations}
-A table of all abbrevations used throughout the thesis follows ~\cite{small}.
+A table of all abbrevations used throughout the thesis follows.
 
 \begin{tabularx}{\textwidth}{|X|X|}
   \hline
   FRP & Functional Reactive Programming \\
+  JVM & Java Virtual Machine \\
+  NCSR & National Centre for Scientific Research \\
+  ROS & Robot Operating System \\
+  IoT & Internet of Things \\
+  CPU & Central Processing Unit \\
+  TCP & Transmission Control Protocol \\
+  PubSub & Publish/Subscribe \\
   \hline
 \end{tabularx}
 
 \end{thesisabbreviations}
 
-\bibliography{thesis}{}
+\nocite{*}
+\newpage
 \bibliographystyle{ieeetr}
-
-
-
-
+\bibliography{thesis}{}
 
 \end{document}

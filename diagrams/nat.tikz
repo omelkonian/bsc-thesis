@@ -1,0 +1,19 @@
+\begin{tikzpicture}[
+  every matrix/.style={ampersand replacement=\&,column sep=3cm,row sep=2cm},
+  source/.style={draw,thick,rounded corners,inner sep=.3cm,fill=yellow!20},
+  process/.style={source,fill=cyan!20},
+  sink/.style={source,fill=green!20},
+  to/.style={->,>=stealth',shorten >=1pt,semithick},
+  every node/.style={align=center}]
+
+  \matrix{
+    \& \node[source] (zero) {0};
+    \& \node[process] (concat) {concat}; 
+    \& \node[sink] (res) {$\mathbb{N}$}; \\
+    \& \& \node[process] (inc) {increment}; \& \& \\
+  };
+  \draw[to] (zero) -- (concat);
+  \draw[to] (concat) -- (res);
+  \draw[to] (concat) to[bend left=50] (inc);
+  \draw[to] (inc) to[bend left=50] (concat);
+\end{tikzpicture} 
