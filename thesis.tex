@@ -3,7 +3,7 @@
 \usepackage{xgreek}
 \usepackage{xunicode}
 
-% Number sets
+% Math
 \usepackage{amsfonts}
 
 % Tikz
@@ -18,7 +18,6 @@
 \setallmainfonts[Mapping=tex-text]{Arial}
 \setallsansfonts[Mapping=tex-text]{Arial}
 \setallmonofonts[Mapping=tex-text]{Arial}
-
 
 \renewcommand{\university}{National and Kapodistrian University of Athens}
 \renewcommand{\school}{Faculty of Exact Sciences}
@@ -104,12 +103,20 @@ The main idea is to provide the programmer with a different execution model, the
 Software is becoming increasingly more complex each year, as computing capabilities are strengthened and user needs become more and more demanding. Thus the need for higher abstraction becomes mandatory, as it provides a more structured, easier to debug and maintainable way of developing software. In other words, abstraction in computer science acts as a mean to overcome complexity. 
 
 In programming languages, the level of the aforementioned abstraction is measured regarding the amount of low-level details a programmer has to specify. Therefore, languages can be divided in two categories: the imperative ones, which specify what needs to be done and how to do it, and the declarative ones, which only specify what needs to be done and rely on the underlying compiler/interpreter to produce the exact commands that will realize the desired behaviour. The most well-known declarative programming paradigms are functional and logic programming, each providing higher abstraction in different aspects. My approach was greatly influenced by the functional paradigm.
+
 \thesissubsubsection{Data versus Computation}			
 
+A common problem in heterogeneous systems is that different representations of the same entities/data-types coexist in the same software and, as a consequence, pure computational tasks are intermingled with data-converting tasks. This makes the code less readable and harder to maintain and understand. In the dataflow execution model, there is a clear separation of these two aspects as data (edges) are completely decoupled from computation (nodes). This motivation is strengthened even more, when cross-machine communication is included, and apart from converting data from one representation to another, serialization(i.e. convertion to bytes) is also mandatory.
+
 \thesissubsubsection{Dataflows in Robotics}
-\thesissubsubsection{Dataflows in Internet of Things}
+
+In control theory, which is the main background theory used in robotics, most architectures and/or algorithms are represented as dataflow diagrams for the sake of clarity and intuition. Translating these diagrams into common "imperative" software is not an easy tasks and is usually the source of bugs. Thus, having a dataflow execution model will nullify the need for such a translation.
+
+Moreover, robotics typically involve several different robotic systems, whose combination is even more challenging. If each individual system is represented as a dataflow graph, composing them together is as trivial as connecting inputs with outputs, which is not the case in a traditional architecture, which is not component-based.
+
 \thesissubsubsection{Dataflows in Big Data}
 
+Another reason for following a dataflow approach is the attention that it recently has drawn in the Big Data field. As data size is growing exponentially and distribution is not a luxury but a necessity, a more scalable and decentralized architecture was destined to be examined in more depth. As we will discuss in the \textit{Related Work} chapter, there are many recent frameworks that became popular for the scalability due to the fact that they rely on a dataflow approach.
 
 \thesissubsection{Outline}
 
@@ -151,6 +158,7 @@ $$ x = 1/2 \int (vr + vl) \cos\theta $$
 Below is the FRP code corresponding to the formula above:
 
 \newmintedfile[hs]{hs}{frame=lines}
+\usemintedstyle{manni}
 \hs{code/frp1.hs}
 
 As the above may seem counter-intuitive, a new notation was conceived, notably the \textit{arrow notation} (cite arrow notation):
@@ -175,10 +183,17 @@ There is no point-to-point communication and no synchronization. \textit{Publish
 
 ROS is an open-source middleware for robot software, which emphasizes large-scale integrative robotics research(cite ROS). It provides a \textit{thin} communication layer between heterogeneous computers, from robots to mainframes and tt has been widely adopted by the research community around the world, due to its flexibility and maximal support of reusability through packaging and composability. It provides a nice solution to the development complexity introduced by complex robot applications that consist of several modules and require different device drivers for each individual robot. 
 
-It follows a peer-to-peer network topology, implemented using a topic-based PubSub messaging protocol and its architecture reflects many sound design principles. Another great property of ROS is that it is language-agnostic, meaning that only a minimal specification language for message transaction has been defined, so contributors are free to implement small clients in different clients.
+It follows a peer-to-peer network topology, implemented using a topic-based PubSub messaging protocol and its architecture reflects many sound design principles. Another great property of ROS is that it is language-agnostic, meaning that only a minimal specification language for message transaction has been defined, so contributors are free to implement small-size clients in different programming languages, with \textit{roscpp} and \textit{rospy} being the most widely used ones.
 
-A typical development scenario is to write several \textit{nodes}, that subscribe to some topics
+A typical development scenario is to write several \textit{nodes}, that subscribe to some topics and, after doing some computation, publish their results on other topics. The main architectural issue here is that subscribing is realized through asynchronous callback functions, so complicated schemes easily lead to unstructured code, which obviously lead to unreadable and hard-to-maintain code. My approach gives a solution to the aforementioned problem.
+ 
 \thesissubsection{Internet of things}
+
+The birth of the Internet gave rise to a concept called \textit{Internet of Things} (IoT), which is essentially the ability of many heterogeneous devices, ranging from low-cost sensors to vehicles with embedded electronics, to collect data and exchange it amongst themselves using the Internet. This gave rise to smart grids, smart homes and eventually smart cities. 
+
+The development of such systems though, due to their heterogeneity, is rather complex and costly. Typical software architectures were not meant to be used in such environments and therefore new tools and concepts needed to be invented. 
+
+Fortunately, the dataflow model seems to be rather fitting for these scenarios, as every node in the graph is completely independent, and consequently can be any "\textit{thing}". This useful property of the model makes it a good architectural choice for such applications. The only thing to consider is how these things will communicate in a standard way, so as to be able to add new types of \textit{things} and integrate it in an effortless way to an existing dataflow network of \textit{things}.
 
 \thesissection{Approach}
 
@@ -190,12 +205,26 @@ A typical development scenario is to write several \textit{nodes}, that subscrib
 \thesissection{Implementation}
 
 \thesissubsection{The Reactive Streams Standard}
+
 \thesissubsection{Stream variables}
+
 \thesissubsection{Stream operators}
+\thesissubsubsection{Creation}
+\thesissubsubsection{Combining}
+\thesissubsubsection{Filtering}
+\thesissubsubsection{Conditional}
+\thesissubsubsection{Transformational}
+\thesissubsubsection{Feedback}
+\thesissubsubsection{Error-handling}
+\thesissubsubsection{Backpressure}
+\thesissubsubsection{Utility}
+
 \thesissubsection{Deployment}
+
 \thesissubsection{Optimization}
 \thesissubsubsection{Heuristic-based graph transformations}
 \thesissubsubsection{Network-aware node placement}
+
 \thesissubsection{Serialization}
 
 \thesissection{Applications}
@@ -207,16 +236,22 @@ A typical development scenario is to write several \textit{nodes}, that subscrib
 
 \thesissection{Related Work}
 
-\thesissubsection{GoogleDataflow}
-\thesissubsection{TensorFlow}
-\thesissubsection{Akka}
-\thesissubsection{dispel4py}
-\thesissubsection{Flowstone}
-\thesissubsection{Spark}
-\thesissubsection{Naiad}
-\thesissubsection{NoFlo}
-\thesissubsection{NodeRed}
-\thesissubsection{Yampa}
+\thesissubsection{Big Data}
+\thesissubsubsection{GoogleDataflow}
+\thesissubsubsection{TensorFlow}
+\thesissubsubsection{Akka}
+\thesissubsubsection{dispel4py}
+\thesissubsubsection{Spark}
+\thesissubsubsection{Naiad}
+
+\thesissubsection{Robotics}
+\thesissubsubsection{Flowstone}
+\thesissubsubsection{Yampa}
+\thesissubsubsection{roshask}
+
+\thesissubsection{Internet of Things}
+\thesissubsubsection{NodeRed}
+\thesissubsubsection{NoFlo}
 
 \thesissection{Future Work}
 
