@@ -271,6 +271,7 @@
                  \addcontentsline{toc}{section}%
                                  {\texorpdfstring{\MakeUppercase{#1}}{#1}}
                  \begin{thebibliography}{#2}
+                   \setlength{\itemsep}{-2mm}
                    \fontsize{10pt}{12pt}\selectfont}
                { \end{thebibliography}}
 %%

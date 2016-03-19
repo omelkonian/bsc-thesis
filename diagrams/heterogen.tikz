@@ -1,0 +1,19 @@
+\begin{tikzpicture}[
+  mindmap, concept color=orange,
+  level 1/.append style={level distance=3cm},
+  level 2/.append style={level distance=3cm},
+  level 3/.append style={level distance=3cm},
+  level 4/.append style={level distance=3cm}
+  ]
+  \tikzset{every concept/.style={minimum size=2cm, text width=2cm}} 
+  \tikzstyle{every node}=[font=\small]
+  \node[concept] {robot\\camera}
+    child[concept color=orange, grow=right]{ node[concept]{compress}
+      child[concept color=green, grow=right]{ node[concept]{image\\processing} 
+        child[concept color=red, grow=right]{  node[concept]{decision}
+          child[concept color=orange, grow=right]{ node[concept]{robot\\command} } 
+        } 
+      }
+    }; 
+
+\end{tikzpicture}

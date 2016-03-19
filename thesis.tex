@@ -9,11 +9,20 @@
 % Tikz
 \usepackage{tikz}
 \usetikzlibrary{arrows}
-\usepackage{caption}
+\usepackage{smartdiagram}
+\usetikzlibrary{mindmap}
+\usetikzlibrary{trees}
+
+% Images
+\usepackage{graphicx}
+\graphicspath{ {images/} }
 
 % Code
 \usepackage{listings}
 \usepackage{minted}
+
+% URL
+\usepackage{url}
 
 \setallmainfonts[Mapping=tex-text]{Arial}
 \setallsansfonts[Mapping=tex-text]{Arial}
@@ -34,7 +43,6 @@
 \renewcommand{\listtablename}{List of Tables\vspace{5 mm}}
 \renewcommand{\tablename}{Table}
 \renewcommand{\refname}{References}
-
 
 \begin{document}
 \thesistitle{RHEA: A Reactive, Heterogeneous, Extensible and Abstract Framework for Dataflow Programming}
@@ -150,29 +158,29 @@ The increased interest in parallelism during the 70's gave rise to the dataflow 
 The main advantage of the dataflow model is its implicit parallelism, deriving from the fact that the computational units are totally independent and therefore can be executed in parallel. The communication can either be an in-memory data storage or even a TCP connection across the network. Its great flexibility and composability make it a good candidate for the underlying architecture of a framework with a high level of abstraction.
 
 \thesissubsection{Functional reactive programming}
-A relatively recent model of programming is Functional Reactive Programming (FRP), which provides a conceptual framework for implementing reactive(i.e. time-varying and responding to external stimuli) behaviour in \textit{hybrid systems} (i.e. containing both continuous and discrete components), such as robots, in functional programming languages. It first appeared as a composable library for graphic animations (cite FRAN), but quickly evolved into a generic paradigm (cite Yale papers). \\
-Although appealing at first, FRP was not appropriate for systems  with real-time constraints (cite EventFRP), due to uncontrollable time- and space- leaks. The solution was a generalization of monads called \textit{arrows} (cite Hughes), which provided the necessary guarantees that the aforementioned common errors do not occur. Let's see the example of calculating a robot's x-coordinate. Here is the mathematical formula drawn from control theory:
+A relatively recent model of programming is Functional Reactive Programming (FRP), which provides a conceptual framework for implementing reactive(i.e. time-varying and responding to external stimuli) behaviour in \textit{hybrid systems} (i.e. containing both continuous and discrete components), such as robots, in functional programming languages. It first appeared as a composable library for graphic animations \cite{fran}, but quickly evolved into a generic paradigm \cite{survey_frp,real_frp,pushpull_frp}. Moreover, extensive research has investigated FRP as a framework for robotics \cite{arrows_robots,lambda_in_motion}. \\
+Although appealing at first, FRP was not appropriate for systems  with real-time constraints, due to uncontrollable time- and space- leaks \cite{event_frp}. The solution was a generalization of monads called \textit{arrows} \cite{arrows}, which provided the necessary guarantees that the aforementioned common errors do not occur. Let's see the example of calculating a robot's x-coordinate. Here is the mathematical formula drawn from control theory:
 
 $$ x = 1/2 \int (vr + vl) \cos\theta $$ 
 
 Below is the FRP code corresponding to the formula above:
 
 \newmintedfile[hs]{hs}{frame=lines}
-\usemintedstyle{manni}
+\usemintedstyle{bw }
 \hs{code/frp1.hs}
 
-As the above may seem counter-intuitive, a new notation was conceived, notably the \textit{arrow notation} (cite arrow notation):
+As the above may seem counter-intuitive, a new notation was conceived, notably the \textit{arrow notation} \cite{arrows_notation}:
 
 \hs{code/frp2.hs}
 
 The main advantages of FRP are its close correspondence to mathematics, which make it an ideal framework for modelling real-time systems, and its concise representation of time-varying values via \textit{signals}. \\
-For a more detailed view of the FRP idiom and all of its variants please see the literature (cite Push/Pull, RealTimeFRP, Yampa).
+For a more detailed view of the FRP idiom and all of its variants please see the cited literature.
 
 \thesissubsection{Publish-Subscribe model}
 
 \textit{Publish/Subscribe}(PubSub) is a communication paradigm that became popular due to the loose coupling of its components, suited for the most recent large-scale distributed applications.
 
-There is no point-to-point communication and no synchronization. \textit{Publishers} advertise messages of a given type to a specific message class or \textit{topic} that is identified by a \textit{keyword}, whereas \textit{subscribers} listen on a specific \textit{topic} without any knowledge of who the publishers are. The component responsible for relaying the messages between machines and/or processes and finding the cheaper dissemination method is called \textit{message broker}. Figure 2 is an abstract graphical representation of the PubSub model.
+There is no point-to-point communication and no synchronization. \textit{Publishers} advertise messages of a given type to a specific message class or \textit{topic} that is identified by a \textit{keyword}, whereas \textit{subscribers} listen on a specific \textit{topic} without any knowledge of who the publishers are. The component responsible for relaying the messages between machines and/or processes and finding the cheaper dissemination method is called \textit{message broker}. Figure 2 illustrates an abstract representation of the PubSub model.
 
 \begin{figure}[h!] \begin{center}    
   	\input{diagrams/pubsub.tikz} 
@@ -181,7 +189,7 @@ There is no point-to-point communication and no synchronization. \textit{Publish
 
 \thesissubsection{ROS: Robot Operating System}
 
-ROS is an open-source middleware for robot software, which emphasizes large-scale integrative robotics research(cite ROS). It provides a \textit{thin} communication layer between heterogeneous computers, from robots to mainframes and tt has been widely adopted by the research community around the world, due to its flexibility and maximal support of reusability through packaging and composability. It provides a nice solution to the development complexity introduced by complex robot applications that consist of several modules and require different device drivers for each individual robot. 
+ROS is an open-source middleware for robot software, which emphasizes large-scale integrative robotics research \cite{ROS}. It provides a \textit{thin} communication layer between heterogeneous computers, from robots to mainframes and tt has been widely adopted by the research community around the world, due to its flexibility and maximal support of reusability through packaging and composability. It provides a nice solution to the development complexity introduced by complex robot applications that consist of several modules and require different device drivers for each individual robot. 
 
 It follows a peer-to-peer network topology, implemented using a topic-based PubSub messaging protocol and its architecture reflects many sound design principles. Another great property of ROS is that it is language-agnostic, meaning that only a minimal specification language for message transaction has been defined, so contributors are free to implement small-size clients in different programming languages, with \textit{roscpp} and \textit{rospy} being the most widely used ones.
 
@@ -195,12 +203,59 @@ The development of such systems though, due to their heterogeneity, is rather co
 
 Fortunately, the dataflow model seems to be rather fitting for these scenarios, as every node in the graph is completely independent, and consequently can be any "\textit{thing}". This useful property of the model makes it a good architectural choice for such applications. The only thing to consider is how these things will communicate in a standard way, so as to be able to add new types of \textit{things} and integrate it in an effortless way to an existing dataflow network of \textit{things}.
 
+\thesissubsection{The Strategy design pattern}
+
+In software engineering, and especially in object-oriented programming(OOP), a \textit{design pattern} is a general repeatable solution to a commonly occurring problem in software design \cite{design}.
+
+One such solution, the \textit{Strategy} design pattern is used when a particular algorithm can be implemented by a variety of behaviours/classes \cite{design}. In such a case, a good idea is to isolate the algorithm in a separate \textit{interface} and allow the system to select the appropriate instantiating classes at runtime.
+
+Figure 3 illustrates the basic UML diagram of the strategy design pattern.
+
+\begin{figure}[h!] \begin{center}    
+	\includegraphics[scale=0.1]{strategy}
+  	\caption{Strategy design pattern}
+\end{center} \end{figure}
+
 \thesissection{Approach}
+The design was heavily influenced by principles set out by the FRP and dataflow models. 
 
 \thesissubsection{Reactive}
+
+The system is \textit{reactive}, as close as possible to the definition of the Reactive Manifesto \cite{manifesto}. 
+
+The system is \textit{responsive}, meaning it should be able to handle time-sensitive scenarios if at all possible. This is the cornerstone of usability and utility, but more than that, it enables quick error-detection and error-handling.
+
+The system is \textit{resilient}, meaning it is able to recover robustly and gracefully after a failure, due to the fact that nodes in the dataflow graph are completely independent and recovery of each one can be done in textit{isolation}. Another thing to note here is that special error messages are built-in and make it very easy to propagate errors between \textit{components}, in case the error-handling part of a component is decoupled from the computational logic. This leads to much more robust architectures for large-scale systems, where fault-tolerance is mission-critical.
+
+The system is \textit{elastic}, meaning it will adjust itself depending on the available resources and demanded workload. For instance, the granularity of the graph (i.e. number of nodes) is adjusted so as to match a heuristic-based value (e.g. total number of threads).
+
+The system is \textit{message-driven}, meaning it relies solely on asynchronous message-passing for inter-component communication leading to loose coupling, isolation, location transparency and the error propagation mentioned above. Location transparency is critical to preserve the semantics whether on a single host or a machine cluster. 
+
+\begin{figure}[h!] \begin{center}    
+  	\input{diagrams/manifesto.tikz} 
+  	\caption{Reactive properties}
+\end{center} \end{figure}
+
 \thesissubsection{Heterogeneous}
+
+One of the major concerns while designing the framework was the ability to deploy it anywhere, from low-cost robots to mainframes. Obviously, such attribute would require a very flexible runtime environment. To satisfy this requirement, the strategy design pattern was used for evaluation, meaning that the core system only builds the internal representation of the dataflow graph and partitions it across the available computational resources. From there onwards, each partial graph can be evaluated by a different \textit{EvaluationStrategy} (see Implementation chapter), which could interpret it using the Java 8 Streams library or even compile into CUDA code for execution on a GPU.
+
+Figure 5 illustrates a simple example of a robot application pipeline, where input to the dataflow graph is what the robot's camera senses, and after some image processing and some computation-heavy decision making, a command to an actuator of the robot is executed. Orange nodes are deployed on the robot's on-board computer, the green node is deployed on an off-board GPU and the red node is deployed on the lab's main cluster.
+
+\begin{figure}[h!] \begin{center}    
+ 	\input{diagrams/heterogen.tikz} 
+  	\caption{Heterogeneity pipeline}
+\end{center} \end{figure}
+
 \thesissubsection{Extensible}
+
+While doing my internship at NCSR "Demokritos", I realized that the goal I was pursuing was impossible to reach closure in a 6-month period by a humble undergraduate student. Therefore, I decided that everything should be implemented in a way that will allow future contribution by me or other researchers/developers. 
+
+With that concept in mind, I started generalizing and abstracting away everything I had done so far with the hope that the framework will raise attention later on. I can now say I am satisfied with the level of abstraction the core system has reached and I hope the stressful refactoring that the framework went through will blossom in the form of future contributions.
+
 \thesissubsection{Abstract}
+
+The framework is \textit{abstract} in terms of implementation details, as it is completely agnostic of any machine-specific or runtime-specific requirements. It is designed as a unifying conceptual base for further refined extensions and careful consideration was taken not to restrict in any aspect, architectural or not. The above was achieved by making many parts of the core system pluggable, which allows for easy refactoring on most of its internal functionality.
 
 \thesissection{Implementation}
 
@@ -221,11 +276,15 @@ Fortunately, the dataflow model seems to be rather fitting for these scenarios, 
 
 \thesissubsection{Deployment}
 
+
 \thesissubsection{Optimization}
+
 \thesissubsubsection{Heuristic-based graph transformations}
 \thesissubsubsection{Network-aware node placement}
 
+
 \thesissubsection{Serialization}
+
 
 \thesissection{Applications}
 
@@ -258,8 +317,9 @@ Fortunately, the dataflow model seems to be rather fitting for these scenarios, 
 \thesissubsection{More evaluation strategies}
 \thesissubsection{Dynamic reconfiguration}
 \thesissubsection{Advanced network profiling}
+\thesissubsection{DSLs for framework extension}
+\thesissubsection{Advanced fault-tolerance}
 \thesissubsection{Integration with other technologies}
-\thesissubsection{Domain-specific operators}
 \thesissubsection{Stream reasoning}
 
 \thesissection{Conclusions}
@@ -291,12 +351,15 @@ A table of all abbrevations used throughout the thesis follows.
   CPU & Central Processing Unit \\
   TCP & Transmission Control Protocol \\
   PubSub & Publish/Subscribe \\
+  OOP & Object-oriented Programming \\
+  UML & Unified Modelling Language \\
+  GPU & Graphics Processing Unit \\
+  DSL & Domain-specific Language \\
   \hline
 \end{tabularx}
 
 \end{thesisabbreviations}
 
-\nocite{*}
 \newpage
 \bibliographystyle{ieeetr}
 \bibliography{thesis}{}
