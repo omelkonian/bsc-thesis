@@ -258,8 +258,23 @@ With that concept in mind, I started generalizing and abstracting away everythin
 The framework is \textit{abstract} in terms of implementation details, as it is completely agnostic of any machine-specific or runtime-specific requirements. It is designed as a unifying conceptual base for further refined extensions and careful consideration was taken not to restrict in any aspect, architectural or not. The above was achieved by making many parts of the core system pluggable, which allows for easy refactoring on most of its internal functionality.
 
 \thesissection{Implementation}
+This section examines the major characteristics of the framework's implementation.
+
+\thesissubsection{Notifications}
+Every value passed through the framework's \textit{streams} is wrapped inside a \textit{Notification} object, which discriminated stream values into three categories: \textit{onNext} (when the stream provides a regular value), \textit{onError} (when an error occurs) and \textit{onComplete} (when the stream completes its output).
 
 \thesissubsection{The Reactive Streams Standard}
+In order to make the framework easy to integrate with other stream and/or dataflow technologies, I decided that every input/output node (i.e. publisher/subscriber in the PubSub terminology or source/sink in the Dataflow terminology) should implement the interfaces that the Reactive Streams Standard (RSS) define. RSS is an initiative to provide a standard for asynchronous stream processing with non-blocking back pressure. This encompasses efforts aimed at runtime environments (JVM and JavaScript) as well as network protocols \cite{rss}.
+
+A sink node (output) should implement the Subscriber interface \footnote{\url{http://www.reactive-streams.org/reactive-streams-1.0.0-javadoc/org/reactivestreams/Subscriber.html}}, which essentially defines three methods corresponding to reactions to a \textit{Notification}, one for each of the categories mentioned above. 
+
+A source node (input) should implement the Publisher interface \footnote{\url{http://www.reactive-streams.org/reactive-streams-1.0.0-javadoc/org/reactivestreams/Publisher.html}}, which defines a single method \textit{subscribe(Subscriber s)}, where a Subscriber requests the Publisher to start emitting values. 
+
+Many existing technologies provide these interfaces, or at least adapters from their internal representations, and therefore they are very easy to be integrated to the framework.
+
+\thesissubsection{Internal representation}
+
+For representing the internal structure of the dataflow graph, the \textit{JGrapht} open-source Java library was used, which provides many graph data structures and common graph-theory algorithms \footnote{\url{http://jgrapht.org/}}. 
 
 \thesissubsection{Stream variables}
 
@@ -274,17 +289,21 @@ The framework is \textit{abstract} in terms of implementation details, as it is 
 \thesissubsubsection{Backpressure}
 \thesissubsubsection{Utility}
 
-\thesissubsection{Deployment}
+\thesissubsection{Distribution}
 
+\thesissubsubsection{Hazelcast}
+Due to the RSS being in its infant stage, no working implementation exists for network distribution (e.g. RSS over TCP). 
+\thesissubsubsection{Machine configuration}
 
 \thesissubsection{Optimization}
 
 \thesissubsubsection{Heuristic-based graph transformations}
 \thesissubsubsection{Network-aware node placement}
 
-
 \thesissubsection{Serialization}
 
+\thesissubsubsection{The Serializer Interface}
+\thesissubsubsection{JsonIO}
 
 \thesissection{Applications}
 
@@ -341,6 +360,7 @@ A table of all abbrevations used throughout the thesis follows.
   UML & Unified Modelling Language \\
   GPU & Graphics Processing Unit \\
   DSL & Domain-specific Language \\
+  RSS & Reactive Streams Standard \\
   \hline
 \end{tabularx}
 
