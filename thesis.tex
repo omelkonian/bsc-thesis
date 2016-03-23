@@ -1,6 +1,6 @@
 \documentclass{dithesis}
 \usepackage{mathspec}
-\usepackage{xgreek}
+%\usepackage{xgreek}
 \usepackage{xunicode}
 
 % Math
@@ -14,11 +14,11 @@
 \usetikzlibrary{trees}
 
 % Images
-\usepackage{graphicx}
+\usepackage{multicol}
 \graphicspath{ {images/} }
 
 % Code
-\usepackage{listings}
+%\usepackage{listings}
 \usepackage{minted}
 
 % URL
@@ -45,6 +45,14 @@
 \renewcommand{\refname}{References}
 
 \begin{document}
+
+% Minted settings
+\newmintedfile[hs]{hs}{frame=lines,framesep=0.5cm}
+\newmintedfile[jv]{java}{frame=lines,framesep=0.5cm}
+
+\usemintedstyle{bw}
+
+
 \thesistitle{RHEA: A Reactive, Heterogeneous, Extensible and Abstract Framework for Dataflow Programming}
 \thesisauthor{Orestis Melkonian}{1115201000128}
 \supervisor{Panos Rondogiannis}{Professor EKPA}
@@ -149,10 +157,11 @@ There are nine chapters which compose this thesis: \textit{Introduction, Backgro
 \thesissubsection{The dataflow computational model}
 The increased interest in parallelism during the 70's gave rise to the dataflow execution model, which is an alternative to the classical "von-Neumann" model. In the dataflow model, everything is represented in a dataflow graph, where nodes are independent computational units  and edges are communication channels between these units. A node/unit is fired immediately when its required inputs are available and therefore no explicit control commands are needed for execution. Figure 1 shows a dataflow graph enumerating the set $\mathbb{N}$ of natural numbers.
 
-\begin{figure}[h!] \begin{center} 
+\begin{figure}[h!]
+	\centering
 	\input{diagrams/nat.tikz}	
 	\caption{Natural numbers}
-\end{center} \end{figure}
+\end{figure}
 
 
 The main advantage of the dataflow model is its implicit parallelism, deriving from the fact that the computational units are totally independent and therefore can be executed in parallel. The communication can either be an in-memory data storage or even a TCP connection across the network. Its great flexibility and composability make it a good candidate for the underlying architecture of a framework with a high level of abstraction.
@@ -165,11 +174,9 @@ $$ x = 1/2 \int (vr + vl) \cos\theta $$
 
 Below is the FRP code corresponding to the formula above:
 
-\newmintedfile[hs]{hs}{frame=lines}
-\usemintedstyle{bw }
 \hs{code/frp1.hs}
 
-As the above may seem counter-intuitive, a new notation was conceived, notably the \textit{arrow notation} \cite{arrows_notation}:
+As the above may seem counter-intuitive and difficult to understand, a new notation was conceived, notably the \textit{arrow notation} \cite{arrows_notation}:
 
 \hs{code/frp2.hs}
 
@@ -182,10 +189,11 @@ For a more detailed view of the FRP idiom and all of its variants please see the
 
 There is no point-to-point communication and no synchronization. \textit{Publishers} advertise messages of a given type to a specific message class or \textit{topic} that is identified by a \textit{keyword}, whereas \textit{subscribers} listen on a specific \textit{topic} without any knowledge of who the publishers are. The component responsible for relaying the messages between machines and/or processes and finding the cheaper dissemination method is called \textit{message broker}. Figure 2 illustrates an abstract representation of the PubSub model.
 
-\begin{figure}[h!] \begin{center}    
+\begin{figure}[h!] 
+	\centering
   	\input{diagrams/pubsub.tikz} 
   	\caption{PubSub typical layout}
-\end{center} \end{figure}
+\end{figure}
 
 \thesissubsection{ROS: Robot Operating System}
 
@@ -211,10 +219,11 @@ One such solution, the \textit{Strategy} design pattern is used when a particula
 
 Figure 3 illustrates the basic UML diagram of the strategy design pattern.
 
-\begin{figure}[h!] \begin{center}    
+\begin{figure}[h!]
+	\centering
 	\includegraphics[scale=0.1]{strategy}
   	\caption{Strategy design pattern}
-\end{center} \end{figure}
+\end{figure}
 
 \thesissection{Approach}
 The design was heavily influenced by principles set out by the FRP and dataflow models. 
@@ -231,10 +240,11 @@ The system is \textit{elastic}, meaning it will adjust itself depending on the a
 
 The system is \textit{message-driven}, meaning it relies solely on asynchronous message-passing for inter-component communication leading to loose coupling, isolation, location transparency and the error propagation mentioned above. Location transparency is critical to preserve the semantics whether on a single host or a machine cluster. 
 
-\begin{figure}[h!] \begin{center}    
+\begin{figure}[h!] 
+	\centering    
   	\input{diagrams/manifesto.tikz} 
   	\caption{Reactive properties}
-\end{center} \end{figure}
+\end{figure}
 
 \thesissubsection{Heterogeneous}
 
@@ -242,10 +252,11 @@ One of the major concerns while designing the framework was the ability to deplo
 
 Figure 5 illustrates a simple example of a robot application pipeline, where input to the dataflow graph is what the robot's camera senses, and after some image processing and some computation-heavy decision making, a command to an actuator of the robot is executed. Orange nodes are deployed on the robot's on-board computer, the green node is deployed on an off-board GPU and the red node is deployed on the lab's main cluster.
 
-\begin{figure}[h!] \begin{center}    
+\begin{figure}[h!] 
+	\centering
  	\input{diagrams/heterogen.tikz} 
   	\caption{Heterogeneity pipeline}
-\end{center} \end{figure}
+\end{figure}
 
 \thesissubsection{Extensible}
 
@@ -255,7 +266,7 @@ With that concept in mind, I started generalizing and abstracting away everythin
 
 \thesissubsection{Abstract}
 
-The framework is \textit{abstract} in terms of implementation details, as it is completely agnostic of any machine-specific or runtime-specific requirements. It is designed as a unifying conceptual base for further refined extensions and careful consideration was taken not to restrict in any aspect, architectural or not. The above was achieved by making many parts of the core system pluggable, which allows for easy refactoring on most of its internal functionality.
+The framework is \textit{abstract} in terms of implementation details, as it is completely agnostic of any machine-specific or runtime-specific requirements. It is designed as a unifying conceptual base for further refined extensions and careful consideration was taken not to restrict in any aspect, architectural or not. The above was achieved by making many parts of the core system pluggable, which allows for easy refactoring on most of its internal functionality. Moreover, the internal graph representation does not include information on how a node is executed, but only what are its semantics.
 
 \thesissection{Implementation}
 This section examines the major characteristics of the framework's implementation.
@@ -272,27 +283,97 @@ A source node (input) should implement the Publisher interface \footnote{\url{ht
 
 Many existing technologies provide these interfaces, or at least adapters from their internal representations, and therefore they are very easy to be integrated to the framework.
 
+\newpage
+
+\thesissubsection{Software structure}
+The core system \footnote{\url{https://github.com/rhea-flow/rhea-core}} is organized in the following top-level packages:
+
+\begin{tabularx}{\textwidth}{rX}
+	\textit{org.rhea\_core.internal} 
+	& all internal functionalities such as graphs, expressions and notifications \\
+	\textit{org.rhea\_core.evaluation}
+	& everything associated with the evaluation of the constructed dataflow graph \\
+	\textit{org.rhea\_core.distribution}
+	& everything associated with distributing the evaluation across the available computational resources \\
+	\textit{org.rhea\_core.optimization}	
+	& includes some built-in optimizers for adjusting the  granularity of the graph \\
+	\textit{org.rhea\_core.io}
+	& defines the interfaces that sources/sinks should implement \\
+	\textit{org.rhea\_core.util}
+	& helpful utilities needed throughout the project \\
+\end{tabularx}
+
 \thesissubsection{Internal representation}
 
-For representing the internal structure of the dataflow graph, the \textit{JGrapht} open-source Java library was used, which provides many graph data structures and common graph-theory algorithms \footnote{\url{http://jgrapht.org/}}. 
+For representing the internal structure of the dataflow graph, the \textit{JGrapht} open-source Java library was used, which provides many graph data structures and common graph-theory algorithms \footnote{\url{http://jgrapht.org/}}. The main class representing the internal dataflow graph is \textit{FlowGraph},  which is located in the \textit{org.rhea\_core.internal} package.
 
 \thesissubsection{Stream variables}
 
+The construction of the aforementioned internal graph is always implicit, through a rich set of stream operators. The only data type handled by the programmer is \textit{org.rhea\_core.Stream}, which contains the parametric type of its single output. Each \textit{Stream} object contains internally a \textit{FlowGraph}, which is only to be accessed and manipulated by the internal module, evaluation strategies and optimizers.
+
+Figure 6 illustrates the dataflow graph(left) produced by the framework code(right) using the \textit{Stream} data type.
+
+\begin{figure}[h!] 
+	\begin{multicols}{2}
+	\resizebox{0.5\textwidth}{!}{
+		\input{diagrams/simple.tikz}	
+	}
+	\jv{code/simple.java}	
+	\end{multicols}
+	\caption{Simple example}
+\end{figure}
+
+These variables can be used, preferably together with their parametric type, and reused in different parts of the graph. This is necessary, for instance, when you wish to split a node's output to different inputs. Figure 7 shows such an example.
+
+\begin{figure}[h!] 
+	\begin{multicols}{2}
+	\resizebox{0.5\textwidth}{!}{
+		\input{diagrams/split.tikz}	
+	}
+	\jv{code/split.java}	
+	\end{multicols}
+	\caption{Split example}
+\end{figure}
+
 \thesissubsection{Stream operators}
+This section displays the set of primitive operators, from which all the available stream operators are derived. 
+
 \thesissubsubsection{Creation}
+from, fromSource, interval, empty, never, repeat, defer
+
 \thesissubsubsection{Combining}
+merge, concat, zip
+
 \thesissubsubsection{Filtering}
+filter, filterMap, distinct, take, skip
+
 \thesissubsubsection{Conditional}
+exists, takeUntil (skipUntil), takeWhile (skipWhile), amb 
+
 \thesissubsubsection{Transformational}
+map, scan, buffer
+
 \thesissubsubsection{Feedback}
+loop
+
 \thesissubsubsection{Error-handling}
+onErrorResume, onErrorReturn, retry
+
 \thesissubsubsection{Backpressure}
+onBackpressureBuffer, onBackpressureDrop, onBackpressureLatest, sample, timeout
+
 \thesissubsubsection{Utility}
+doOnComplete/onError/onNext, cache, delay, (de)materialize, error, using
+
+\thesissubsection{Evaluation}
+
+
 
 \thesissubsection{Distribution}
 
 \thesissubsubsection{Hazelcast}
-Due to the RSS being in its infant stage, no working implementation exists for network distribution (e.g. RSS over TCP). 
+Due to the RSS being in its infant stage, no working implementation exists for superimposing a network protocol onto it (e.g. RSS over TCP). 
+
 \thesissubsubsection{Machine configuration}
 
 \thesissubsection{Optimization}

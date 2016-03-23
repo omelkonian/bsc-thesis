@@ -293,11 +293,11 @@
 \RequirePackage{graphicx}              % To include graphics
 \RequirePackage{float}                 % Figures
 \RequirePackage[caption=false]{subfig} % Subfigures
-\RequirePackage[%
-  justification=centering,
-  labelsep=colon,
-  figureposition=bottom,
-  tableposition=top]{caption}          % Captions
+%\RequirePackage[%
+%  justification=centering,
+%  labelsep=colon,
+%  figureposition=bottom,
+%  tableposition=top]{caption}          % Captions
 
 % caption fonts should be boldface 10pt.
 \renewcommand{\captionfont}{\fontsize{10pt}{12pt}\selectfont\bfseries}

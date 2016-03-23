@@ -1,0 +1,16 @@
+\begin{tikzpicture}[
+  every matrix/.style={ampersand replacement=\&,column sep=1cm,row sep=0.5cm},
+  every node/.style={align=center}]
+
+  \matrix{
+    \& \node (map) {\tiny{map\{f\}}};  
+    \& \node (out) {\tiny{print}}; \\
+    \node (ini) {\tiny{1..10}}; \\
+    \& \node (fil) {\tiny{filter\{g\}}};  
+    \& \node (outt) {\tiny{print}}; \\    
+  };
+  \draw (ini) -- (map);
+  \draw (ini) -- (fil);
+  \draw (map) -- (out);
+  \draw (fil) -- (outt);  
+\end{tikzpicture} 
