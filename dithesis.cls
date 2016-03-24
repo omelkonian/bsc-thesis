@@ -292,7 +292,7 @@
 %%
 \RequirePackage{graphicx}              % To include graphics
 \RequirePackage{float}                 % Figures
-\RequirePackage[caption=false]{subfig} % Subfigures
+\RequirePackage{subfig} % Subfigures
 %\RequirePackage[%
 %  justification=centering,
 %  labelsep=colon,
