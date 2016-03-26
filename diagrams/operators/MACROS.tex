@@ -1,0 +1,30 @@
+\newcommand{\op}[1]{
+  	\node[draw,rounded corners,thick,fit={(0,.8)(5,1.2)}]{\newline #1};
+}
+\newcommand{\stream}[1]{
+	\draw[->,very thick] (0,#1) -- (5,#1);
+}
+\newcommand{\dotstream}[2]{
+	\draw[->,very thick] (0,#1) -- (#2,#1);
+	\draw[dotted] (#2,#1) -- (5,#1);
+}
+\newcommand{\onnext}[4]{
+	\draw (#1,#2) node [draw,circle,fill=#3] {\tiny #4};
+}
+\newcommand{\error}[2]{
+	\draw[myrd, line width=1mm] (#1-0.3,#2-0.3) -- (#1+0.3,#2+0.3) (#1+0.3,#2-0.3) -- (#1-0.3,#2+0.3);
+}
+\newcommand{\complete}[2]{
+	\draw[mygr, line width=1mm] (#1,#2-0.2) -- (#1,#2+0.2);
+}
+
+\newcommand\mat[2]{
+	\node [rectangle,minimum size=5.5mm,inner sep=0pt,outer sep=0pt,thick,fill=mybr,opacity=.8] at (#1,#2) {};
+}
+
+\renewcommand\wr{
+	\draw[red,thick,dashed,fit=(current bounding box.south west) (current bounding box.north east)];	 
+	%\drawred,thick,dashed] (current bounding box.north west) -- (current bounding box.north east);
+% \drawdecorate,decoration={brace,raise=2ex,mirror},very thick](current bounding box.north west) -- (current bounding box.south west);
+
+}
