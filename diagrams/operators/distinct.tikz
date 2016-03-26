@@ -6,7 +6,7 @@
 	\onnext{4}{2}{mygr}{}
 	\complete{4.5}{2}
 
-	\op{itit}
+	\op{distinct}
 
 	\stream{0}
 	\onnext{1}{0}{myrd}{}

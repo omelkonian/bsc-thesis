@@ -8,7 +8,7 @@
 	\onnext{1}{2}{mygr}{}
 	\complete{2}{2}
 
-	\op{t}
+	\op{concat}
 
 	\stream{0}		
 	\onnext{1}{0}{myrd}{}

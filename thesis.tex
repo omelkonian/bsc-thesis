@@ -3,6 +3,7 @@
 \usepackage{xunicode}
 
 \usepackage{enumitem}
+\usepackage{ifthen}
 
 % Math
 \usepackage{amsfonts}
@@ -53,6 +54,8 @@
 \renewcommand{\refname}{References}
 
 \begin{document}
+
+\input{MACROS.tex}
 
 % Minted settings
 \newmintedfile[hs]{hs}{frame=lines,framesep=0.5cm}
@@ -164,11 +167,7 @@ There are nine chapters which compose this thesis: \textit{Introduction, Backgro
 \thesissubsection{The dataflow computational model}
 The increased interest in parallelism during the 70's gave rise to the dataflow execution model, which is an alternative to the classical "von-Neumann" model. In the dataflow model, everything is represented in a dataflow graph, where nodes are independent computational units  and edges are communication channels between these units. A node/unit is fired immediately when its required inputs are available and therefore no explicit control commands are needed for execution. Figure 1 shows a dataflow graph enumerating the set $\mathbb{N}$ of natural numbers.
 
-\begin{figure}[h!]
-	\centering
-	\input{diagrams/nat.tikz}	
-	\caption{Natural numbers}
-\end{figure}
+\mydiag{nat}{Natural numbers}	
 
 
 The main advantage of the dataflow model is its implicit parallelism, deriving from the fact that the computational units are totally independent and therefore can be executed in parallel. The communication can either be an in-memory data storage or even a TCP connection across the network. Its great flexibility and composability make it a good candidate for the underlying architecture of a framework with a high level of abstraction.
@@ -196,11 +195,7 @@ For a more detailed view of the FRP idiom and all of its variants please see the
 
 There is no point-to-point communication and no synchronization. \textit{Publishers} advertise messages of a given type to a specific message class or \textit{topic} that is identified by a \textit{keyword}, whereas \textit{subscribers} listen on a specific \textit{topic} without any knowledge of who the publishers are. The component responsible for relaying the messages between machines and/or processes and finding the cheaper dissemination method is called \textit{message broker}. Figure 2 illustrates an abstract representation of the PubSub model.
 
-\begin{figure}[h!] 
-	\centering
-  	\input{diagrams/pubsub.tikz} 
-  	\caption{PubSub typical layout}
-\end{figure}
+\mydiag{pubsub}{PubSub typical layout}
 
 \thesissubsection{ROS: Robot Operating System}
 
@@ -226,7 +221,7 @@ One such solution, the \textit{Strategy} design pattern is used when a particula
 
 Figure 3 illustrates the basic UML diagram of the strategy design pattern.
 
-\begin{figure}[h!]
+\begin{figure}[h!] 
 	\centering
 	\includegraphics[scale=0.1]{strategy}
   	\caption{Strategy design pattern}
@@ -247,11 +242,7 @@ The system is \textit{elastic}, meaning it will adjust itself depending on the a
 
 The system is \textit{message-driven}, meaning it relies solely on asynchronous message-passing for inter-component communication leading to loose coupling, isolation, location transparency and the error propagation mentioned above. Location transparency is critical to preserve the semantics whether on a single host or a machine cluster. 
 
-\begin{figure}[h!] 
-	\centering    
-  	\input{diagrams/manifesto.tikz} 
-  	\caption{Reactive properties}
-\end{figure}
+\mydiag{manifesto}{Reactive properties}
 
 \thesissubsection{Heterogeneous}
 
@@ -259,11 +250,7 @@ One of the major concerns while designing the framework was the ability to deplo
 
 Figure 5 illustrates a simple example of a robot application pipeline, where input to the dataflow graph is what the robot's camera senses, and after some image processing and some computation-heavy decision making, a command to an actuator of the robot is executed. Orange nodes are deployed on the robot's on-board computer, the green node is deployed on an off-board GPU and the red node is deployed on the lab's main cluster.
 
-\begin{figure}[h!] 
-	\centering
- 	\input{diagrams/heterogen.tikz} 
-  	\caption{Heterogeneity pipeline}
-\end{figure}
+\mydiag{heterogen}{Heterogeneity pipeline}
 
 \thesissubsection{Extensible}
 
@@ -347,416 +334,128 @@ This section displays the set of primitive operators, from which all the availab
 
 In the marble diagrams on the right, circles represent \textit{onNext} notifications, green bars \textit{onComplete} and red x signals an \textit{onError}.
 
-\input{diagrams/operators/MACROS.tex}
 \newcommand{\lll}{0.4\linewidth}
-\newcommand{\rrr}{0.5\linewidth}
+\newcommand{\rrr}{0.4\linewidth}
 
 \thesissubsubsection{Creation}
 The following operators act as source nodes in the dataflow graph.
 \begin{description}
-
-\begin{minipage}[c]{\lll}
-\item[from] (Iterable \textbf{i}) \\ 	
-	\textit{inputs}: none \\
-	\textit{output}: \textbf{i} as a stream \\
-\end{minipage}
-\hfill
-\begin{minipage}[c]{\rrr}
-\input{diagrams/operators/from.tikz}
-\end{minipage}
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[fromSource](Source \textbf{s}) \\ 
-	\textit{inputs}: none \\
-	\textit{output}: the values emitted by \textbf{s} \\
-\end{minipage}
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[interval](TimeInterval \textbf{t}) \\ 
-	\textit{inputs}: none \\
-	\textit{output}: the natural numbers emitted every \textbf{t} \newline \newline \newline
-\end{minipage}
-\hfill
-\begin{minipage}[c]{\rrr}
-\input{diagrams/operators/interval.tikz}
-\end{minipage}
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[empty] ~\\ 
-	\textit{inputs}: none \\
-	\textit{output}: an empty stream \\
-\end{minipage}
-\hfill
-\begin{minipage}[c]{\rrr}
-\input{diagrams/operators/empty.tikz}
-\end{minipage}
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[never] ~\\ 
-	\textit{inputs}: none \\
-	\textit{output}: a stream that emits no notification \\
-\end{minipage}
-\hfill
-\begin{minipage}[c]{\rrr}
-\input{diagrams/operators/never.tikz}
-\end{minipage}
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[repeat](int \textbf{n}) \\ 
-	\textit{inputs}: single \\
-	\textit{output}: repeats the values of the input stream \textbf{n} times, or infinitely if $\textbf{n} < 0$ \\
-\end{minipage}
-\hfill
-\begin{minipage}[c]{\rrr}
-\input{diagrams/operators/repeat.tikz}
-\end{minipage}
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[defer](\textbf{f} $\{ () \to Stream \}$) \\ 
-	\textit{inputs}: none \\
-	\textit{output}: the stream generated by the given stream factory \textbf{f}\\
-\end{minipage}
-\newline \newline \newline
+\myitem{from}{(Iterable \textbf{i})}{none}{\textbf{i} as a stream}
+\myitemm{fromSource}{(Source \textbf{s})}{none}{the values emitted by \textbf{s}}
+\myitem{interval}{(TimeInterval \textbf{t})}{none}{the natural numbers emitted every \textbf{t}}
+\myitem{empty}{~}{none}{an empty stream}
+\myitem{never}{~}{none}{a stream that emits no notification}
+\myitem{repeat}{(int \textbf{n})}{single}{repeats the values of the input stream \textbf{n} times, or infinitely if $\textbf{n} < 0$}
+\myitemm{defer}{(\textbf{f} $\{ () \to Stream \}$)}{none}{the stream generated by the given stream factory \textbf{f}}
 \end{description}
 
 \thesissubsubsection{Combining}
 The following operators combine multiple streams to produce another one.
 \begin{description}
-
-\begin{minipage}[c]{\lll}
-\item[merge] ~\\
-	\textit{inputs}: many \\
-	\textit{output}: merges the input streams and completes as soon as any of them completes
-\end{minipage}
-\hfill
-\begin{minipage}[c]{\rrr}
-\input{diagrams/operators/merge.tikz}
-\end{minipage}
-\begin{minipage}[c]{\lll}
-\item[concat] ~\\
-	\textit{inputs}: many \\
-	\textit{output}: concatenates the input streams in the given order
-\end{minipage}
-\hfill
-\begin{minipage}[c]{\rrr}
-\input{diagrams/operators/concat.tikz}
-\end{minipage}
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[zip] (\textbf{f} $\{ (A1...An) \to B \}$) \\
-	\textit{inputs}: many \\
-	\textit{output}: zips the input streams with the given function \textbf{f}
-\end{minipage}
-\hfill
-\begin{minipage}[c]{\rrr}
-\input{diagrams/operators/zip.tikz}
-\end{minipage}
-
+\myitem{merge}{~}{many}{merges the input streams and completes as soon as any of them completes}
+\myitem{concat}{~}{many}{concatenates the input streams in the given order}
+\myitem{zip}{(\textbf{f} $\{ (A1...An) \to B \}$)}{many}{zips the input streams with the given function \textbf{f}}
 \end{description}
 
 \thesissubsubsection{Filtering}
 The following operators filter the values emitted by another stream.
 \begin{description}
-
-\begin{minipage}[c]{\lll}
-\item[filter] (\textbf{f} $\{ A \to Boolean \}$) \\
-	\textit{inputs}: single \\
-	\textit{output}: emits only values $i$ of the input stream, where $f(i) = true$
-\end{minipage}
-\hfill
-\begin{minipage}[c]{\rrr}
-\input{diagrams/operators/filter.tikz}
-\end{minipage}
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[filterMap] (\textbf{f} $\{ A \to B \}$, \textbf{g} $\{ B \to Boolean \}$) \\
-	\textit{inputs}: single \\
-	\textit{output}: emits only values $f(i)$ of the input stream the, where $(f \circ g)(i) = true$
-\end{minipage}
-\hfill
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[distinct] ~\\
-	\textit{inputs}: single \\
-	\textit{output}: removes all duplicate values of the input stream		
-\end{minipage}
-\hfill
-\begin{minipage}[c]{\rrr}
-\input{diagrams/operators/distinct.tikz}
-\end{minipage}
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[take] (int \textbf{n}) \\
-	\textit{inputs}: single \\
-	\textit{output}: extracts the first (last) \textbf{n} values of the input stream, if $\textbf{n} > 0 (< 0)$			
-\end{minipage}
-\hfill
-\begin{minipage}[c]{\rrr}
-\input{diagrams/operators/take.tikz}
-\end{minipage}
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[skip] (int \textbf{n}) \\
-	\textit{inputs}: single \\
-	\textit{output}: skips the first (last) \textbf{n} values of the input stream, if $\textbf{n} > 0 (< 0)$
-\end{minipage}
-\hfill
-\begin{minipage}[c]{\rrr}
-\input{diagrams/operators/skip.tikz}
-\end{minipage}
-\newline \newline \newline
+\myitem{filter}{(\textbf{f} $\{ A \to Boolean \}$)}{single}{emits only values $i$ of the input stream, where $f(i) = true$}
+\myitemm{filterMap}{(\textbf{f} $\{ A \to B \}$, \textbf{g} $\{ B \to Boolean \}$)}{single}{emits only values $f(i)$ of the input stream the, where $(f \circ g)(i) = true$}
+\myitem{distinct}{~}{single}{removes all duplicate values of the input stream}
+\myitem{take}{(int \textbf{n})}{single}{extracts the first (last) \textbf{n} values of the input stream, if $\textbf{n} > 0 (< 0)$}
+\myitem{skip}{(int \textbf{n})}{single}{skips the first (last) \textbf{n} values of the input stream, if $\textbf{n} > 0 (< 0)$}
 \end{description}
 
 \thesissubsubsection{Conditional}
 The following operators behave depending on some conditions on their input stream
 \begin{description}
-
-\begin{minipage}[c]{\lll}
-\item[exists] (\textbf{f} $\{ A \to Boolean \}$) \\
-	\textit{inputs}: single \\
-	\textit{output}: returns True, if the input stream contains a value i, where $f(i) = true$ and False otherwise
-\end{minipage}
-\hfill
-\begin{minipage}[c]{\rrr}
-\input{diagrams/operators/exists.tikz}
-\end{minipage}
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[takeUntil] (Stream s) \\
-	\textit{inputs}: single \\
-	\textit{output}: extracts values of the input stream, until stream \textbf{s} emits a value
-\end{minipage}
-\hfill
-\\
-\begin{minipage}[c]{\lll}
-\item[skipUntil] (Stream s) \\
-	\textit{inputs}: single \\
-	\textit{output}: skips values of the input stream, until stream \textbf{s} emits a value
-\end{minipage}
-\hfill
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[takeWhile] (\textbf{f} $\{ A \to Boolean \}$) \\
-	\textit{inputs}: single \\
-	\textit{output}: extracts values of the input stream until a value i is emitted, where $f(i) = false$
-\end{minipage}
-\hfill
-\begin{minipage}[c]{\rrr}
-\input{diagrams/operators/takeWhile.tikz}
-\end{minipage}
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[skipWhile] (\textbf{f} $\{ A \to Boolean \}$) \\
-	\textit{inputs}: single \\
-	\textit{output}: skip values of the input stream until a value i is emitted, where $f(i) = false$
-\end{minipage}
-\hfill
-\begin{minipage}[c]{\rrr}
-\input{diagrams/operators/skipWhile.tikz}
-\end{minipage}
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[amb] ~\\
-	\textit{inputs}: many \\
-	\textit{output}: emits the values of one its input streams, whichever emits a value or terminates first
-\end{minipage}
-\hfill
-\begin{minipage}[c]{\rrr}
-\input{diagrams/operators/amb.tikz}
-\end{minipage}
-\newline \newline \newline
+\myitem{amb}{~}{many}{emits the values of one its input streams, whichever emits a value or terminates first}
+\myitem{exists}{(\textbf{f} $\{ A \to Boolean \}$)}{single}{returns True, if the input stream contains a value i, where $f(i) = true$ and False otherwise}
+\myitemm{takeUntil}{(Stream \textbf{s})}{single}{extracts values of the input stream, until stream \textbf{s} emits a value}
+\myitemm{skipUntil}{(Stream \textbf{s})}{single}{skips values of the input stream, until stream \textbf{s} emits a value}
+\myitem{takeWhile}{(\textbf{f} $\{ A \to Boolean \}$)}{single}{extracts values of the input stream until a value i is emitted, where $f(i) = false$}
+\myitem{skipWhile}{(\textbf{f} $\{ A \to Boolean \}$)}{single}{skips values of the input stream until a value i is emitted, where $f(i) = false$}
 \end{description}
 
 \thesissubsubsection{Transformational}
 The following operators transform their input stream
 \begin{description}
-
-\begin{minipage}[c]{\lll}
-\item[map] (\textbf{f} $\{ A \to B \}$)\\
-	\textit{inputs}: single \\
-	\textit{output}: transforms the input stream by applying function \textbf{f} to every value emitted	
-\end{minipage}
-\hfill
-\begin{minipage}[c]{\rrr}
-\input{diagrams/operators/map.tikz}
-\end{minipage}
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[scan] (B seed, \textbf{f} $\{ (B, A) \to B \}$)\\
-	\textit{inputs}: single \\
-	\textit{output}: transforms the input stream by sequentially applying function \textbf{f} to every value emitted  and emitting each result along the way
-\end{minipage}
-\hfill
-\begin{minipage}[c]{\rrr}
-\input{diagrams/operators/scan.tikz}
-\end{minipage}
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[buffer] (int \textbf{n})\\
-	\textit{inputs}: single \\
-	\textit{output}: packs together every \textbf{n} values of the input stream into a single List item
-\end{minipage}
-\hfill
-\begin{minipage}[c]{\rrr}
-\input{diagrams/operators/buffer.tikz}
-\end{minipage}
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[buffer] (TimeInterval \textbf{t})\\
-	\textit{inputs}: single \\
-	\textit{output}: packs together values of the input stream emitted every \textbf{t} into a single List item
-\end{minipage}
-\newline \newline \newline
+\myitem{map}{(\textbf{f} $\{ A \to B \}$)}{single}{transforms the input stream by applying function \textbf{f} to every value emitted}
+\myitem{scan}{(B seed, \textbf{f} $\{ (B, A) \to B \}$)}{single}{transforms the input stream by sequentially applying function \textbf{f} to every value emitted  and emitting each result along the way}
+\myitem{buffer}{(int \textbf{n})}{single}{packs together every \textbf{n} values of the input stream into a single List item}
+\myitemm{buffer}{(TimeInterval \textbf{t})}{single}{packs together values of the input stream emitted every \textbf{t} into a single List item}
 \end{description}
 
 \thesissubsubsection{Feedback}
 This operator enables cycles in the dataflow graph.
 \begin{description}
-
-\begin{minipage}[c]{\lll}
-\item[loop] (\textbf{f} $\{ Stream \to Stream \}$)
-	\textit{inputs}: single
-	\textit{output}: attaches a sub-graph to the input stream's output, whose result act as feedback to the attachment point
-\end{minipage}
-\hfill
-\begin{minipage}[c]{\rrr}
-\input{diagrams/operators/loop.tikz}
-\end{minipage}
-\newline \newline \newline
+\myitem{loop}{(\textbf{f} $\{ Stream \to Stream \}$)}{single}{attaches a sub-graph to the input stream's output, whose result act as feedback to the attachment point}
 \end{description}
 
 \thesissubsubsection{Error-handling}
 The following operators are a mean to handle errors.
 \begin{description}
 
-\begin{minipage}[c]{\lll}
-\item[onErrorResume] (Stream \textbf{s})\\
-	\textit{inputs}: single \\
-	\textit{output}: mirrors the input stream, but instead of emitting an \textit{onError} Notification when an error occurs, continues emitting values of the given stream \textbf{s}
-\end{minipage}
-\hfill
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[onErrorReturn] (\textbf{f} $\{ Throwable \to A \}$)\\
-	\textit{inputs}: single \\
-	\textit{output}: mirrors the input stream, but instead of emitting an \textit{onError} Notification when an error e occurs, emits the value $f(e)$ followed by a \textit{onComplete} Notification
-\end{minipage}
-\hfill
-\begin{minipage}[c]{\rrr}
-\input{diagrams/operators/onErrorReturn.tikz}
-\end{minipage}
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[retry] (int \textbf{n})\\
-	\textit{inputs}: single \\
-	\textit{output}: mirrors the input stream, but instead of emitting an \textit{onError} Notification when an error occurs, resubscribes to it \textbf{n} times if $n > 0$, infinitely otherwise
-\end{minipage}
-\hfill
-\newline \newline \newline
+\myitemm{onErrorResume}{(Stream \textbf{s})}{single}{mirrors the input stream, but instead of emitting an \textit{onError} Notification when an error occurs, continues emitting values of the given stream \textbf{s}}
+\myitem{onErrorReturn}{(\textbf{f} $\{ Throwable \to A \}$)}{single}{mirrors the input stream, but instead of emitting an \textit{onError} Notification when an error e occurs, emits the value $f(e)$ followed by a \textit{onComplete} Notification}
+\myitemm{retry}{(int \textbf{n})}{single}{mirrors the input stream, but instead of emitting an \textit{onError} Notification when an error occurs, resubscribes to it \textbf{n} times if $n > 0$, infinitely otherwise}
 \end{description}
 
 \thesissubsubsection{Backpressure}
 The following operators specify how a node behaves when the requests are too intense to handle, computationally or memory-wise. \textit{Backpressure} is the mechanism that handles fast publishers that interact with slow subscribers.
 \begin{description}
-
-\begin{minipage}[c]{\lll}
-\item[onBackpressureBuffer] (int \textbf{n})\\
-	\textit{inputs}: single \\
-	\textit{output}: buffers values that cannot be handled by the subscriber to emit them later on
-\end{minipage}
-\hfill
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[onBackpressureDrop] (int \textbf{n})\\
-	\textit{inputs}: single \\
-	\textit{output}: drops values that cannot be handled by the subscriber, instead of emitting them
-\end{minipage}
-\hfill
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[onBackpressureLatest] (int \textbf{n})\\
-	\textit{inputs}: single \\
-	\textit{output}: drops values that cannot be handled by the subscriber and always buffers the last one, instead of emitting them
-\end{minipage}
-\hfill
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[sample] (TimeInterval \textbf{t})\\
-	\textit{inputs}: single \\
-	\textit{output}: emits only the most-recent emitted value from the input stream with periodic time intervals \textbf{t}
-\end{minipage}
-\hfill
-\begin{minipage}[c]{\rrr}
-\input{diagrams/operators/sample.tikz}
-\end{minipage}
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[timeout] (TimeInteval \textbf{t})\\
-	\textit{inputs}: single \\
-	\textit{output}: mirros the input stream, but emits \textit{onError} if there is no emission within time windows of \textbf{t}
-\end{minipage}
-\hfill
-\newline \newline \newline
+\myitemm{onBackpressureBuffer}{~}{single}{buffers values that cannot be handled by the subscriber to emit them later on}
+\myitemm{onBackpressureDrop}{~}{single}{drops values that cannot be handled by the subscriber, instead of emitting them}
+\myitemm{onBackpressureLatest}{~}{single}{drops values that cannot be handled by the subscriber and always buffers the last one, instead of emitting them}
+\myitem{sample}{(TimeInterval \textbf{t})}{single}{emits only the most-recent emitted value from the input stream within intervals of \textbf{t}}
+\myitemm{timeout}{(TimeInteval \textbf{t})}{single}{mirros the input stream, but emits \textit{onError} if there is no emission within time windows of \textbf{t}}
 \end{description}
 
 \thesissubsubsection{Utility}
 The following operators provide some helpful utilities.
 \begin{description}
-
-\begin{minipage}[c]{\lll}
-\item[doOnNext(Complete/Error)] (Action \textbf{a})\\
-	\textit{inputs}: single \\
-	\textit{output}: execute Action \textbf{a} whenever onNext(Complete/Error) is called
-\end{minipage}
-\hfill
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[cache] ~\\
-	\textit{inputs}: single \\
-	\textit{output}: caches values emitted by the input stream for future subscribers
-\end{minipage}
-\hfill
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[delay] (TimeInterval \textbf{t})\\
-	\textit{inputs}: single \\
-	\textit{output}: emits the values of the input stream shifted forward in time by \textbf{t}
-\end{minipage}
-\hfill
-\begin{minipage}[c]{\rrr}
-\input{diagrams/operators/delay.tikz}
-\end{minipage}
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[materialize] ~\\
-	\textit{inputs}: single \\
-	\textit{output}: wraps all values of input stream as Notifications
-\end{minipage}
-\hfill
-\begin{minipage}[c]{\rrr}
-\input{diagrams/operators/materialize.tikz}
-\end{minipage}
-\newline \newline \newline
-\begin{minipage}[c]{\lll}
-\item[dematerialize] ~\\
-	\textit{inputs}: single \\
-	\textit{output}: reverses the effect of \textbf{materialize}
-\end{minipage}
-\hfill
-\begin{minipage}[c]{\rrr}
-\input{diagrams/operators/dematerialize.tikz}
-\end{minipage}
-\newline \newline \newline
+\myitemm{doOnNext}{(Action \textbf{a})}{single}{execute Action \textbf{a} whenever onNext(Complete/Error) is called}
+\myitemm{cache}{~}{single}{caches values emitted by the input stream for future subscribers}
+\myitem{delay}{(TimeInterval \textbf{t})}{single}{emits the values of the input stream shifted forward in time by \textbf{t}}
+\myitem{materialize}{~}{single}{wraps all values of input stream as Notifications}
+\myitem{dematerialize}{~}{single}{reverses the effect of \textbf{materialize}}
 \end{description}
+
+All other operators can be produced by combining the above primitive ones \\
+(e.g. $flatMap \equiv map \circ merge$).
 
 \thesissubsection{Evaluation}
 
+Every primitive operator corresponds to an expression implementing the \textit{Transformer} interface, defined in the \textit{org.rhea\_core.internal.expressions} package. 
 
+A complete dataflow is defined by a \textit{Stream} variable and an object implementing the \textit{Output} interface, which can be either an \textit{Action}, a \textit{Sink} or a list of these. 
+
+In order to evaluate a constructed dataflow graph the strategy design pattern is used, therefore a class implementing the \textit{EvaluationStrategy} interface, found in the \textit{org.rhea\_core.evaluation} package, needs to be provided. An \textit{EvaluationStrategy} just takes the \textit{Stream} variable and its corresponding \textit{Output} and executes it, however desired.
+
+The strategies I have implemented so far follow:
+
+\begin{description}[style=nextline]
+\item[RxJavaEvaluationStrategy\footnote{\url{https://github.com/rhea-flow/rx-eval}}] 
+Uses rxjava\footnote{\url{https://github.com/ReactiveX/RxJava}}, which is a famous and well-maintained library for asynchronous programming using the \textit{Observable} type, which is very close, semantically, to my \textit{Stream} variable.
+
+\item[RosEvaluationStrategy\footnote{\url{https://github.com/rhea-flow/ros-eval}}] 
+Integrates the ROS middleware into the framework, by providing the \textit{RosTopic} class, which implements the \textit{AbstractTopic} interface defined in the \textit{org.rhea\_core.io} package. This strategy's job is to set up a ROS client and configure every \textit{RosTopic} used within the dataflow that needs to be evaluated to use this client. After that, evaluation is propagated to a generic strategy (e.g. rxjava).
+
+\item[MqttEvaluationStrategy\footnote{\url{https://github.com/rhea-flow/mqtt-eval}}] 
+Integrates the MQTT middleware into the framework, in the same way ROS is intergrated.
+\end{description}
 
 \thesissubsection{Distribution}
 
+An evaluation strategy executes the requested dataflow graph in a single machine, without concern about distribution and resource utilization.
+
+For distribution and cluster management, the strategy design pattern is used again, specifically the \textit{DistributionStrategy} interface, which is defined in the \textit{org.rhea\_core.internal.distribution} package. Its responsibility is to take the whole initial graph that we need to evaluate and, after adjusting its granularity (i.e. size) to fit the available resources (see \textit{Optimization} section), partition it across all computational resources, maybe using different evaluation strategies.
+
 \thesissubsubsection{Hazelcast}
-Due to the RSS being in its infant stage, no working implementation exists for superimposing a network protocol onto it (e.g. RSS over TCP). 
+Due to the RSS being in its infant stage, no working implementation exists for superimposing a network protocol onto it (e.g. RSS over TCP). For this reason, I relied upon the open-source Hazelcast library\footnote{\url{http://hazelcast.org/}} to discover and manage multiple machines and used its internal decentralized PubSub model to communicate intermediate results across the network. Figure 8 illustrates a dataflow graph on the left and the same graph partitioned over several machines on the right.
+
+\twofig{partition1}{partition2}{Partitioning}
 
 \thesissubsubsection{Machine configuration}
 

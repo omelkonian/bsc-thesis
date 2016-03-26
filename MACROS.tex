@@ -1,0 +1,76 @@
+% Marble Diagrams
+\newcommand{\op}[1]{
+  	\node[draw,rounded corners,thick,fit={(0,.8)(5,1.2)}]{\newline #1};
+}
+\newcommand{\stream}[1]{
+	\draw[->,very thick] (0,#1) -- (5,#1);
+}
+\newcommand{\dotstream}[2]{
+	\draw[->,very thick] (0,#1) -- (#2,#1);
+	\draw[dotted] (#2,#1) -- (5,#1);
+}
+\newcommand{\onnext}[4]{
+	\draw (#1,#2) node [draw,circle,fill=#3] {\tiny #4};
+}
+\newcommand{\error}[2]{
+	\draw[myrd, line width=1mm] (#1-0.3,#2-0.3) -- (#1+0.3,#2+0.3) (#1+0.3,#2-0.3) -- (#1-0.3,#2+0.3);
+}
+\newcommand{\complete}[2]{
+	\draw[mygr, line width=1mm] (#1,#2-0.2) -- (#1,#2+0.2);
+}
+\newcommand\mat[2]{
+	\node [rectangle,minimum size=5.5mm,inner sep=0pt,outer sep=0pt,thick,fill=mybr,opacity=.8] at (#1,#2) {};
+}
+\newcommand\llist[2]{
+	\node[draw,rounded corners,thick,fit={(#1-0.1,-0.3)(#2+0.1,0.3)}]{};
+}
+
+% Dataflow graphs
+
+
+% General macros
+\newcommand\mydiag[2]{
+	\begin{figure}[h!] 
+	\centering
+ 	\input{diagrams/#1.tikz}
+  	\caption{#2}
+\end{figure}
+}
+
+\newcommand\myop[2]{
+	\begin{figure}[h!] 
+	\centering
+ 	\input{diagrams/operators/#1.tikz}
+  	\caption{#2}
+\end{figure}
+}
+
+\newcommand\twofig[3]{
+	\begin{figure}[h!] 	
+	\begin{minipage}[c]{0.5\linewidth} \input{diagrams/#1.tikz} \end{minipage}
+	\hfill
+	\begin{minipage}[c]{0.5\linewidth} \input{diagrams/#2.tikz} \end{minipage}
+	\caption{#3}
+	\end{figure}
+}
+
+\newcommand\myitem[4]{
+	\begin{minipage}[c]{0.4\linewidth}
+	\item[#1] #2 \\
+	\textit{inputs}: #3 \\
+	\textit{output}: #4
+	\end{minipage}
+	\hfill
+	\begin{minipage}[c]{0.4\linewidth} \input{diagrams/operators/#1.tikz} \end{minipage}
+	\newline \newline \newline
+}
+
+\newcommand\myitemm[4]{
+	\begin{minipage}[c]{0.4\linewidth}
+	\item[#1] #2 \\
+	\textit{inputs}: #3 \\
+	\textit{output}: #4
+	\end{minipage}
+	\hfill
+	\newline \newline \newline
+}

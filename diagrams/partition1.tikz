@@ -1,0 +1,14 @@
+\begin{tikzpicture}[
+  every matrix/.style={ampersand replacement=\&,column sep=0.5cm,row sep=0.5cm},
+  every node/.style={align=center}]
+
+  \matrix{
+    \\    
+    \node (ini) {\tiny{1..10}}; 
+    \& \node (map) {\tiny{map\{f\}}}; 
+    \& \node (out) {\tiny{print}}; \\
+    \\
+  };
+  \draw (ini) -- (map);
+  \draw (map) -- (out);
+\end{tikzpicture} 

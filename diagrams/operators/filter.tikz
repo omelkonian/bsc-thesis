@@ -6,7 +6,7 @@
 	\onnext{4}{2}{mygr}{}
 	\complete{4.5}{2}
 
-	\op{filter \{ only non-red \}}
+	\op{filter \{ not red \}}
 
 	\stream{0}
 	\onnext{2}{0}{mybl}{}

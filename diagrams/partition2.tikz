@@ -1,0 +1,23 @@
+\begin{tikzpicture}[
+  every matrix/.style={ampersand replacement=\&,column sep=0.5cm,row sep=0.5cm},
+  every node/.style={align=center}]
+
+  \matrix{
+    \& \node (ini) {\tiny{1..10}}; 
+    \& \node (iniA) {\tiny{ topic1 }}; \\
+    
+    \node (mapB) {\tiny{ from\{ topic1 \} }};
+    \& \node (map) {\tiny{map\{f\}}}; 
+    \& \node (mapA) {\tiny{ topic2 }}; \\
+
+    \node (outB) {\tiny{ from\{ topic2 \} }};
+    \& \node (out) {\tiny{print}}; \\
+  };
+  
+  \draw (ini) -- (iniA);
+  \draw[red, dotted] (iniA) to[out=-40,in=140] (mapB);
+  \draw (mapB) -- (map);
+  \draw (map) -- (mapA);
+  \draw[red, dotted] (mapA) to[out=-40,in=140] (outB);
+  \draw (outB) -- (out);
+\end{tikzpicture} 
