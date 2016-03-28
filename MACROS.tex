@@ -26,7 +26,16 @@
 }
 
 % Dataflow graphs
-
+\tikzset{
+	dataflow/.style={draw, fill=myye, rounded corners, thick},  	  	
+  	machine/.style={draw, fill=myrd!80, rounded corners, thick, inner sep=.5cm},
+  	task/.style={draw, fill=mygr!80, rounded corners, thick, inner sep=.5cm},
+  	to/.style={->,>=stealth',shorten >=1pt,semithick},
+  	net/.style={to, red, dotted},
+  	opt/.style={->,>=stealth',shorten >=1pt,semithick,draw=red},
+  	every matrix/.style= 	{ampersand replacement=\&},
+  	every node/.style={align=center}
+}
 
 % General macros
 \newcommand\mydiag[2]{
@@ -46,7 +55,7 @@
 }
 
 \newcommand\twofig[3]{
-	\begin{figure}[h!] 	
+	\begin{figure}[h!]
 	\begin{minipage}[c]{0.5\linewidth} \input{diagrams/#1.tikz} \end{minipage}
 	\hfill
 	\begin{minipage}[c]{0.5\linewidth} \input{diagrams/#2.tikz} \end{minipage}
@@ -73,4 +82,21 @@
 	\end{minipage}
 	\hfill
 	\newline \newline \newline
+}
+
+\newcommand\optimization[2]{
+	\begin{figure}[h!]
+
+	\begin{minipage}[c]{0.4\linewidth} 
+		\input{diagrams/optimization/#1B.tikz} 
+	\end{minipage}
+	\begin{minipage}[c]{0.2\linewidth} 
+		\includegraphics[scale=0.2]{arrow} 
+	\end{minipage}
+	\hfill
+	\begin{minipage}[c]{0.3\linewidth} 
+		\input{diagrams/optimization/#1A.tikz} 
+	\end{minipage}
+	\caption{#2}
+	\end{figure}	
 }

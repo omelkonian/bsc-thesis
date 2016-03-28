@@ -1,14 +1,12 @@
-\begin{tikzpicture}[
-  every matrix/.style={ampersand replacement=\&,column sep=1cm,row sep=0.5cm},
-  every node/.style={align=center}]
-
+\begin{tikzpicture}
+  [every matrix/.append style={column sep=1cm, row sep=0.5cm}]
   \matrix{
-    \node (fst) {\tiny{1..10}}; \\
-    \& \node (zip) {\tiny{zip(+)}};  
-    \& \node (out) {\tiny{2,4,6,8...}}; \\
-    \node (snd) {{\tiny 1..10}}; \\
+    \node[dataflow] (fst) {\tiny{1..10}}; \\
+    \& \node[dataflow] (zip) {\tiny{zip(+)}};  
+    \& \node[dataflow] (out) {\tiny{2,4,6,8...}}; \\
+    \node[dataflow] (snd) {{\tiny 1..10}}; \\
   };
-  \draw (fst) -- (zip);
-  \draw (snd) -- (zip);
-  \draw (zip) -- (out);  
+  \draw[to] (fst) -- (zip);
+  \draw[to] (snd) -- (zip);
+  \draw[to] (zip) -- (out);  
 \end{tikzpicture} 

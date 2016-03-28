@@ -1,16 +1,10 @@
-\begin{tikzpicture}[
-  every matrix/.style={ampersand replacement=\&,column sep=3cm,row sep=2cm},
-  source/.style={draw,thick,rounded corners,inner sep=.3cm,fill=yellow!20},
-  process/.style={source,fill=cyan!20},
-  sink/.style={source,fill=green!20},
-  to/.style={->,>=stealth',shorten >=1pt,semithick},
-  every node/.style={align=center}]
-
+\begin{tikzpicture}
+  [every matrix/.append style={column sep=2cm, row sep=1cm}]
   \matrix{
-    \& \node[source] (zero) {0};
-    \& \node[process] (concat) {concat}; 
-    \& \node[sink] (res) {$\mathbb{N}$}; \\
-    \& \& \node[process] (inc) {increment}; \& \& \\
+    \node[dataflow] (zero) {0};
+    \& \node[dataflow] (concat) {concat}; 
+    \& \node[dataflow] (res) {$\mathbb{N}$}; \\
+    \& \node[dataflow] (inc) {increment}; \\
   };
   \draw[to] (zero) -- (concat);
   \draw[to] (concat) -- (res);

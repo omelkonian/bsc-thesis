@@ -1,14 +1,10 @@
-\begin{tikzpicture}[
-  every matrix/.style={ampersand replacement=\&,column sep=0.5cm,row sep=0.5cm},
-  every node/.style={align=center}]
-
-  \matrix{
-    \\    
-    \node (ini) {\tiny{1..10}}; 
-    \& \node (map) {\tiny{map\{f\}}}; 
-    \& \node (out) {\tiny{print}}; \\
-    \\
+\begin{tikzpicture}
+  [every matrix/.append style={column sep=1cm}]
+  \matrix{    
+    \node[dataflow] (ini) {\small{1..10}}; 
+    \& \node[dataflow] (map) {\small{map\{ f \}}}; 
+    \& \node[dataflow] (out) {\small{print}}; \\  
   };
-  \draw (ini) -- (map);
-  \draw (map) -- (out);
+  \draw[to] (ini) -- (map);
+  \draw[to] (map) -- (out);
 \end{tikzpicture} 

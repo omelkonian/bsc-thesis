@@ -1,7 +1,6 @@
 \documentclass{dithesis}
 \usepackage{mathspec}
 \usepackage{xunicode}
-
 \usepackage{enumitem}
 \usepackage{ifthen}
 
@@ -17,10 +16,9 @@
 \usepackage{xcolor}
 \definecolor{num}{HTML}{FF7506}
 \definecolor{myrd}{HTML}{B60005}
-\definecolor{mybl}{HTML}{00706C}
-\definecolor{mygr}{HTML}{079500}
+\definecolor{mybl}{HTML}{00706C}\definecolor{mygr}{HTML}{079500}
 \definecolor{mybr}{HTML}{B85200}
-\definecolor{myye}{HTML}{758500}
+\colorlet{myye}{yellow!30}
 
 % Images
 \usepackage{multicol}
@@ -169,7 +167,6 @@ The increased interest in parallelism during the 70's gave rise to the dataflow 
 
 \mydiag{nat}{Natural numbers}	
 
-
 The main advantage of the dataflow model is its implicit parallelism, deriving from the fact that the computational units are totally independent and therefore can be executed in parallel. The communication can either be an in-memory data storage or even a TCP connection across the network. Its great flexibility and composability make it a good candidate for the underlying architecture of a framework with a high level of abstraction.
 
 \thesissubsection{Functional reactive programming}
@@ -199,9 +196,9 @@ There is no point-to-point communication and no synchronization. \textit{Publish
 
 \thesissubsection{ROS: Robot Operating System}
 
-ROS is an open-source middleware for robot software, which emphasizes large-scale integrative robotics research \cite{ROS}. It provides a \textit{thin} communication layer between heterogeneous computers, from robots to mainframes and tt has been widely adopted by the research community around the world, due to its flexibility and maximal support of reusability through packaging and composability. It provides a nice solution to the development complexity introduced by complex robot applications that consist of several modules and require different device drivers for each individual robot. 
+\textit{ROS} is an open-source middleware for robot software, which emphasizes large-scale integrative robotics research \cite{ROS}. It provides a \textit{thin} communication layer between heterogeneous computers, from robots to mainframes and tt has been widely adopted by the research community around the world, due to its flexibility and maximal support of reusability through packaging and composability. It provides a nice solution to the development complexity introduced by complex robot applications that consist of several modules and require different device drivers for each individual robot. 
 
-It follows a peer-to-peer network topology, implemented using a topic-based PubSub messaging protocol and its architecture reflects many sound design principles. Another great property of ROS is that it is language-agnostic, meaning that only a minimal specification language for message transaction has been defined, so contributors are free to implement small-size clients in different programming languages, with \textit{roscpp} and \textit{rospy} being the most widely used ones.
+It follows a peer-to-peer network topology, implemented using a topic-based PubSub messaging protocol and its architecture reflects many sound design principles. Another great property of \textit{ROS} is that it is language-agnostic, meaning that only a minimal specification language for message transaction has been defined, so contributors are free to implement small-size clients in different programming languages, with \textit{roscpp} and \textit{rospy} being the most widely used ones.
 
 A typical development scenario is to write several \textit{nodes}, that subscribe to some topics and, after doing some computation, publish their results on other topics. The main architectural issue here is that subscribing is realized through asynchronous callback functions, so complicated schemes easily lead to unstructured code, which obviously lead to unreadable and hard-to-maintain code. My approach gives a solution to the aforementioned problem.
  
@@ -273,14 +270,14 @@ In order to make the framework easy to integrate with other stream and/or datafl
 
 A sink node (output) should implement the Subscriber interface \footnote{\url{http://www.reactive-streams.org/reactive-streams-1.0.0-javadoc/org/reactivestreams/Subscriber.html}}, which essentially defines three methods corresponding to reactions to a \textit{Notification}, one for each of the categories mentioned above. 
 
-A source node (input) should implement the Publisher interface \footnote{\url{http://www.reactive-streams.org/reactive-streams-1.0.0-javadoc/org/reactivestreams/Publisher.html}}, which defines a single method \textit{subscribe(Subscriber s)}, where a Subscriber requests the Publisher to start emitting values. 
+A source node (input) should implement the Publisher interface\footnote{\url{http://www.reactive-streams.org/reactive-streams-1.0.0-javadoc/org/reactivestreams/Publisher.html}}, which defines a single method \textit{subscribe(Subscriber s)}, where a Subscriber requests the Publisher to start emitting values. 
 
 Many existing technologies provide these interfaces, or at least adapters from their internal representations, and therefore they are very easy to be integrated to the framework.
 
 \newpage
 
 \thesissubsection{Software structure}
-The core system \footnote{\url{https://github.com/rhea-flow/rhea-core}} is organized in the following top-level packages:
+The core system\footnote{\url{https://github.com/rhea-flow/rhea-core}} is organized in the following top-level packages:
 
 \begin{tabularx}{\textwidth}{rX}
 	\textit{org.rhea\_core.internal} 
@@ -299,7 +296,7 @@ The core system \footnote{\url{https://github.com/rhea-flow/rhea-core}} is organ
 
 \thesissubsection{Internal representation}
 
-For representing the internal structure of the dataflow graph, the \textit{JGrapht} open-source Java library was used, which provides many graph data structures and common graph-theory algorithms \footnote{\url{http://jgrapht.org/}}. The main class representing the internal dataflow graph is \textit{FlowGraph},  which is located in the \textit{org.rhea\_core.internal} package.
+For representing the internal structure of the dataflow graph, the \textit{JGrapht} open-source Java library was used, which provides many graph data structures and common graph-theory algorithms\footnote{\url{http://jgrapht.org/}}. The main class representing the internal dataflow graph is \textit{FlowGraph},  which is located in the \textit{org.rhea\_core.internal} package.
 
 \thesissubsection{Stream variables}
 
@@ -346,7 +343,7 @@ The following operators act as source nodes in the dataflow graph.
 \myitem{empty}{~}{none}{an empty stream}
 \myitem{never}{~}{none}{a stream that emits no notification}
 \myitem{repeat}{(int \textbf{n})}{single}{repeats the values of the input stream \textbf{n} times, or infinitely if $\textbf{n} < 0$}
-\myitemm{defer}{(\textbf{f} $\{ () \to Stream \}$)}{none}{the stream generated by the given stream factory \textbf{f}}
+\myitemm{defer}{($\textbf{f}:() \to Stream$)}{none}{the stream generated by the given stream factory \textbf{f}}
 \end{description}
 
 \thesissubsubsection{Combining}
@@ -354,14 +351,15 @@ The following operators combine multiple streams to produce another one.
 \begin{description}
 \myitem{merge}{~}{many}{merges the input streams and completes as soon as any of them completes}
 \myitem{concat}{~}{many}{concatenates the input streams in the given order}
-\myitem{zip}{(\textbf{f} $\{ (A1...An) \to B \}$)}{many}{zips the input streams with the given function \textbf{f}}
+\myitem{zip}{($\textbf{f}: A1...An \to B$)}{many}{zips the input streams with the given function \textbf{f}}
 \end{description}
 
 \thesissubsubsection{Filtering}
 The following operators filter the values emitted by another stream.
 \begin{description}
-\myitem{filter}{(\textbf{f} $\{ A \to Boolean \}$)}{single}{emits only values $i$ of the input stream, where $f(i) = true$}
-\myitemm{filterMap}{(\textbf{f} $\{ A \to B \}$, \textbf{g} $\{ B \to Boolean \}$)}{single}{emits only values $f(i)$ of the input stream the, where $(f \circ g)(i) = true$}
+\myitem{filter}{($\textbf{f}: A \to Boolean$)}{single}{emits only values $i$ of the input stream, where $f(i) = true$}
+\myitemm{filterMap}
+{(\textbf{f}: A $\to$ B, \textbf{g}: B $\to$ Boolean)}{single}{emits only values $f(i)$ of the input stream the, where $(f \circ g)(i) = true$}
 \myitem{distinct}{~}{single}{removes all duplicate values of the input stream}
 \myitem{take}{(int \textbf{n})}{single}{extracts the first (last) \textbf{n} values of the input stream, if $\textbf{n} > 0 (< 0)$}
 \myitem{skip}{(int \textbf{n})}{single}{skips the first (last) \textbf{n} values of the input stream, if $\textbf{n} > 0 (< 0)$}
@@ -371,18 +369,18 @@ The following operators filter the values emitted by another stream.
 The following operators behave depending on some conditions on their input stream
 \begin{description}
 \myitem{amb}{~}{many}{emits the values of one its input streams, whichever emits a value or terminates first}
-\myitem{exists}{(\textbf{f} $\{ A \to Boolean \}$)}{single}{returns True, if the input stream contains a value i, where $f(i) = true$ and False otherwise}
+\myitem{exists}{($\textbf{f}: A \to Boolean$)}{single}{returns True, if the input stream contains a value i, where $f(i) = true$ and False otherwise}
 \myitemm{takeUntil}{(Stream \textbf{s})}{single}{extracts values of the input stream, until stream \textbf{s} emits a value}
 \myitemm{skipUntil}{(Stream \textbf{s})}{single}{skips values of the input stream, until stream \textbf{s} emits a value}
-\myitem{takeWhile}{(\textbf{f} $\{ A \to Boolean \}$)}{single}{extracts values of the input stream until a value i is emitted, where $f(i) = false$}
-\myitem{skipWhile}{(\textbf{f} $\{ A \to Boolean \}$)}{single}{skips values of the input stream until a value i is emitted, where $f(i) = false$}
+\myitem{takeWhile}{($\textbf{f}: A \to Boolean$)}{single}{extracts values of the input stream until a value i is emitted, where $f(i) = false$}
+\myitem{skipWhile}{($\textbf{f}: A \to Boolean$)}{single}{skips values of the input stream until a value i is emitted, where $f(i) = false$}
 \end{description}
 
 \thesissubsubsection{Transformational}
 The following operators transform their input stream
 \begin{description}
-\myitem{map}{(\textbf{f} $\{ A \to B \}$)}{single}{transforms the input stream by applying function \textbf{f} to every value emitted}
-\myitem{scan}{(B seed, \textbf{f} $\{ (B, A) \to B \}$)}{single}{transforms the input stream by sequentially applying function \textbf{f} to every value emitted  and emitting each result along the way}
+\myitem{map}{($\textbf{f}: A \to B$)}{single}{transforms the input stream by applying function \textbf{f} to every value emitted}
+\myitem{scan}{(B seed, $\textbf{f}: B \times A \to B$)}{single}{transforms the input stream by sequentially applying function \textbf{f} to every value emitted  and emitting each result along the way}
 \myitem{buffer}{(int \textbf{n})}{single}{packs together every \textbf{n} values of the input stream into a single List item}
 \myitemm{buffer}{(TimeInterval \textbf{t})}{single}{packs together values of the input stream emitted every \textbf{t} into a single List item}
 \end{description}
@@ -390,7 +388,7 @@ The following operators transform their input stream
 \thesissubsubsection{Feedback}
 This operator enables cycles in the dataflow graph.
 \begin{description}
-\myitem{loop}{(\textbf{f} $\{ Stream \to Stream \}$)}{single}{attaches a sub-graph to the input stream's output, whose result act as feedback to the attachment point}
+\myitem{loop}{($\textbf{f}: Stream \to Stream$)}{single}{attaches a sub-graph to the input stream's output, whose result act as feedback to the attachment point}
 \end{description}
 
 \thesissubsubsection{Error-handling}
@@ -398,7 +396,7 @@ The following operators are a mean to handle errors.
 \begin{description}
 
 \myitemm{onErrorResume}{(Stream \textbf{s})}{single}{mirrors the input stream, but instead of emitting an \textit{onError} Notification when an error occurs, continues emitting values of the given stream \textbf{s}}
-\myitem{onErrorReturn}{(\textbf{f} $\{ Throwable \to A \}$)}{single}{mirrors the input stream, but instead of emitting an \textit{onError} Notification when an error e occurs, emits the value $f(e)$ followed by a \textit{onComplete} Notification}
+\myitem{onErrorReturn}{($\textbf{f}: Throwable \to A$)}{single}{mirrors the input stream, but instead of emitting an \textit{onError} Notification when an error e occurs, emits the value $f(e)$ followed by a \textit{onComplete} Notification}
 \myitemm{retry}{(int \textbf{n})}{single}{mirrors the input stream, but instead of emitting an \textit{onError} Notification when an error occurs, resubscribes to it \textbf{n} times if $n > 0$, infinitely otherwise}
 \end{description}
 
@@ -440,10 +438,10 @@ The strategies I have implemented so far follow:
 Uses rxjava\footnote{\url{https://github.com/ReactiveX/RxJava}}, which is a famous and well-maintained library for asynchronous programming using the \textit{Observable} type, which is very close, semantically, to my \textit{Stream} variable.
 
 \item[RosEvaluationStrategy\footnote{\url{https://github.com/rhea-flow/ros-eval}}] 
-Integrates the ROS middleware into the framework, by providing the \textit{RosTopic} class, which implements the \textit{AbstractTopic} interface defined in the \textit{org.rhea\_core.io} package. This strategy's job is to set up a ROS client and configure every \textit{RosTopic} used within the dataflow that needs to be evaluated to use this client. After that, evaluation is propagated to a generic strategy (e.g. rxjava).
+Integrates the \textit{ROS} middleware into the framework, by providing the \textit{RosTopic} class, which implements the \textit{AbstractTopic} interface defined in the \textit{org.rhea\_core.io} package. This strategy's job is to set up a \textit{ROS} client and configure every \textit{RosTopic} used within the dataflow that needs to be evaluated to use this client. After that, evaluation is propagated to a generic strategy (e.g. rxjava).
 
 \item[MqttEvaluationStrategy\footnote{\url{https://github.com/rhea-flow/mqtt-eval}}] 
-Integrates the MQTT middleware into the framework, in the same way ROS is intergrated.
+Integrates the MQTT middleware into the framework, in the same way \textit{ROS} is intergrated.
 \end{description}
 
 \thesissubsection{Distribution}
@@ -453,21 +451,68 @@ An evaluation strategy executes the requested dataflow graph in a single machine
 For distribution and cluster management, the strategy design pattern is used again, specifically the \textit{DistributionStrategy} interface, which is defined in the \textit{org.rhea\_core.internal.distribution} package. Its responsibility is to take the whole initial graph that we need to evaluate and, after adjusting its granularity (i.e. size) to fit the available resources (see \textit{Optimization} section), partition it across all computational resources, maybe using different evaluation strategies.
 
 \thesissubsubsection{Hazelcast}
-Due to the RSS being in its infant stage, no working implementation exists for superimposing a network protocol onto it (e.g. RSS over TCP). For this reason, I relied upon the open-source Hazelcast library\footnote{\url{http://hazelcast.org/}} to discover and manage multiple machines and used its internal decentralized PubSub model to communicate intermediate results across the network. Figure 8 illustrates a dataflow graph on the left and the same graph partitioned over several machines on the right.
+
+Due to the RSS being in its infant stage, no working implementation exists for superimposing a network protocol onto it (e.g. RSS over TCP). For this reason, I relied upon the open-source \textit{Hazelcast} library\footnote{\url{http://hazelcast.org/}} to discover and manage multiple machines and used its internal decentralized PubSub model to communicate intermediate results across the network. Figure 8 illustrates a dataflow graph on the left and the same graph partitioned over several machines on the right.
 
 \twofig{partition1}{partition2}{Partitioning}
 
 \thesissubsubsection{Machine configuration}
 
+According to the distribution strategy being used, the available machines will require a certain initial configuration. For the \textit{Hazelcast} case, a little piece of setup code needs to be executed on every member of the cluster, which is together with the main \textit{Strategy} class. Moreover, helpful information can also be added at this step, such as number of CPU cores. It is the distribution strategy's responsibility to ensure that this information is properly distributed and handled.
+
+Apart from this initial configuration, the distribution strategy needs to enable members to declare certain skills that they possess, which are required by specialized nodes. For instance, a source node emitting values from a \textit{ROS} topic must be executed on a machine having \textit{ROS} installed, in order to set up a \textit{ROS} client. In the \textit{Hazelcast} case, these skills are just \textit{strings} and are declared in the initialization code of each machine separately.
+
 \thesissubsection{Optimization}
 
-\thesissubsubsection{Heuristic-based graph transformations}
-\thesissubsubsection{Network-aware node placement}
+This section describes three stages of optimization the dataflow graph goes through before being evaluated. To aid extensibility  the strategy design pattern is again used, whose corresponding interface \textit{OptimizationStrategy} resides in the \textit{org.rhea\_core.optimization} package. Figure 9 illustrates the optimization stages.
+
+\mydiag{optimization}{Optimization stages}
+
+\thesissubsubsection{Proactive filtering}
+
+The first optimization stage is a heuristic one, based on the fact that if a filter operation can be moved earlier (i.e. closer to source nodes) while preserving the original semantics, then there will be benefit concerning computational cost and across-machine communication overhead. The figures below show the corresponding graph transformations.
+
+\optimization{maptake}{Take/skip/distinct before map}
+\optimization{mapfilter}{Filter before map}
+\optimization{concatdistinct}{Filter/distinct before concat/merge}
+
+\thesissubsubsection{Granularity adjustment}
+
+Different nodes of the dataflow graph will be executed on a separate thread/process. The fact that graphs can grow very big poses a problem when available computational resources are limited. For this reason, the second optimization stage tries to adjust the granularity of the dataflow graph to a desired value, which is the number of available threads amongst all machines. 
+
+To achieve this, the optimizer applies some semantic-preserving transformation, as shown in the figures below (for simplicity, only a single example of each general case is demonstrated). 
+
+\optimization{mergemap}{Merge maps}
+\optimization{embedmap}{Embed map in creation}
+\optimization{embedrepeat}{Embed repeat in creation}
+\optimization{combmapfilter}{Combine map with filter}
+\optimization{combfilterexists}{Combine filter with exists}
+\optimization{combmapexists}{Combine map with exists}
+\optimization{combmapzip}{Combine map with zip}
+\optimization{combzipmap}{Combine zip with map}
+\optimization{meaningless}{Meaningless nevers}
+
+\thesissubsubsection{Node placement}
+
+After the first two passes, we have an optimized dataflow graph with fine-tuned granularity. At this stage, nodes are mapped to tasks and are deployed across the available machines. 
+
+If the desired granularity has not been reached yet, the \textit{DistributionStrategy} applies fusion to pairs of tasks until it reaches it, as shown in Figure 22.
+
+\optimization{fusion}{Task fusion}
+
+The final decision to be made is where each of these newly constructed tasks will be executed, although some of them need to necessarily be placed on specific machines with certain skills. 
+
+Apart from these hard constraints, we need to minimize communication overhead. For this purpose, the strategy design pattern is again used, namely the \textit{NetworkProfileStrategy} that is defined in the \textit{org.rhea\_core.distribution} package. Its responsibility is to calculate a network distance between each pair of available machines, which is fed as input to the \textit{NodePlacement} optimizer. 
+
+At this stage, we identify the aforementioned network distance as cost and apply brute-force to find the optimal placement of the (groups of) tasks that minimize that cost.
 
 \thesissubsection{Serialization}
 
-\thesissubsubsection{The Serializer Interface}
-\thesissubsubsection{JsonIO}
+As communication between machines across a network is mandatory, data types emitted through the streams must be serialized on departure and de-serialized on arrival at each machine. For this reason, each \textit{DistributionStrategy} must be configured with a class implementing the \textit{Serializer} interface, define in the \textit{org.rhea\_core.serialization} package. The byte representation of the objects is parametric for maximum flexibility. 
+
+A default \textit{Serializer} is provided with the core system, which can serialize every class implementing the \textit{Serializable} interface. In addition to that, the JsonIO library\footnote{\url{https://github.com/jdereg/json-io}} is used which allows serialization of many types of classes, but still does not cover every possible one. Figure 10 depicts the serialization process in more detail.
+
+\mydiag{serialization}{Serialization process}
 
 \thesissection{Applications}
 
@@ -503,7 +548,8 @@ Due to the RSS being in its infant stage, no working implementation exists for s
 \thesissubsection{DSLs for framework extension}
 \thesissubsection{Advanced fault-tolerance}
 \thesissubsection{Integration with other technologies}
-\thesissubsection{Stream reasoning}
+\thesissubsection{Visual language}
+\thesissubsection{Stream reasoning}	
 
 \thesissection{Conclusions}
 
