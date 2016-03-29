@@ -13,10 +13,10 @@
   };
   
   \draw[to] (ini) -- (iniA);
-  \draw[red, thick, dotted] (iniA) to[out=-40,in=140] (mapB);
+  \draw[to, red, thick, dotted] (iniA) to[out=-40,in=140] (mapB);
   \draw[to] (mapB) -- (map);
   \draw[to] (map) -- (mapA);
-  \draw[red, thick, dotted] (mapA) to[out=-40,in=140] (outB);
+  \draw[to, red, thick, dotted] (mapA) to[out=-40,in=140] (outB);
   \draw[to] (outB) -- (out);
 
   \begin{scope}[on background layer]

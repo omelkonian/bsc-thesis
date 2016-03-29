@@ -1,11 +1,11 @@
 \begin{tikzpicture}
   [every matrix/.append style={column sep=1cm, row sep=0.5cm}]       
   \matrix{
-    \& \node[dataflow] (map) {\tiny{map\{f\}}};  
-    \& \node[dataflow] (out) {\tiny{print}}; \\
-    \node[dataflow] (ini) {\tiny{1..10}}; \\
-    \& \node[dataflow] (fil) {\tiny{filter\{g\}}};  
-    \& \node[dataflow] (outt) {\tiny{print}}; \\    
+    \& \node[dataflow] (map) {\small map\{f\}};  
+    \& \node[dataflow] (out) {\small print}; \\
+    \node[dataflow] (ini) {\small 1..10}; \\
+    \& \node[dataflow] (fil) {\small filter\{g\}};  
+    \& \node[dataflow] (outt) {\small print}; \\    
   };
   \draw[to] (ini) -- (map);
   \draw[to] (ini) -- (fil);
