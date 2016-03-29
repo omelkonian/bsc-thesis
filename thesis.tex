@@ -58,6 +58,7 @@
 % Minted settings
 \newmintedfile[hs]{hs}{frame=lines,framesep=0.5cm}
 \newmintedfile[jv]{java}{frame=lines,framesep=0.5cm}
+\newmintedfile[scala]{scala}{frame=lines,framesep=0.5cm}
 \usemintedstyle{bw}
 
 
@@ -268,16 +269,16 @@ Every value passed through the framework's \textit{streams} is wrapped inside a 
 \thesissubsection{The Reactive Streams Standard}
 In order to make the framework easy to integrate with other stream and/or dataflow technologies, I decided that every input/output node (i.e. publisher/subscriber in the PubSub terminology or source/sink in the Dataflow terminology) should implement the interfaces that the Reactive Streams Standard (RSS) define. RSS is an initiative to provide a standard for asynchronous stream processing with non-blocking back pressure. This encompasses efforts aimed at runtime environments (JVM and JavaScript) as well as network protocols \cite{rss}.
 
-A sink node (output) should implement the Subscriber interface \footnote{\url{http://www.reactive-streams.org/reactive-streams-1.0.0-javadoc/org/reactivestreams/Subscriber.html}}, which essentially defines three methods corresponding to reactions to a \textit{Notification}, one for each of the categories mentioned above. 
+A sink node (output) should implement the Subscriber interface \site{http://www.reactive-streams.org/reactive-streams-1.0.0-javadoc/org/reactivestreams/Subscriber.html}, which essentially defines three methods corresponding to reactions to a \textit{Notification}, one for each of the categories mentioned above. 
 
-A source node (input) should implement the Publisher interface\footnote{\url{http://www.reactive-streams.org/reactive-streams-1.0.0-javadoc/org/reactivestreams/Publisher.html}}, which defines a single method \textit{subscribe(Subscriber s)}, where a Subscriber requests the Publisher to start emitting values. 
+A source node (input) should implement the Publisher interface\site{http://www.reactive-streams.org/reactive-streams-1.0.0-javadoc/org/reactivestreams/Publisher.html}, which defines a single method \textit{subscribe(Subscriber s)}, where a Subscriber requests the Publisher to start emitting values. 
 
 Many existing technologies provide these interfaces, or at least adapters from their internal representations, and therefore they are very easy to be integrated to the framework.
 
 \newpage
 
 \thesissubsection{Software structure}
-The core system\footnote{\url{https://github.com/rhea-flow/rhea-core}} is organized in the following top-level packages:
+The core system\site{https://github.com/rhea-flow/rhea-core} is organized in the following top-level packages:
 
 \begin{tabularx}{\textwidth}{rX}
 	\textit{org.rhea\_core.internal} 
@@ -296,7 +297,7 @@ The core system\footnote{\url{https://github.com/rhea-flow/rhea-core}} is organi
 
 \thesissubsection{Internal representation}
 
-For representing the internal structure of the dataflow graph, the \textit{JGrapht} open-source Java library was used, which provides many graph data structures and common graph-theory algorithms\footnote{\url{http://jgrapht.org/}}. The main class representing the internal dataflow graph is \textit{FlowGraph},  which is located in the \textit{org.rhea\_core.internal} package.
+For representing the internal structure of the dataflow graph, the \textit{JGrapht} open-source Java library was used, which provides many graph data structures and common graph-theory algorithms\site{http://jgrapht.org/}. The main class representing the internal dataflow graph is \textit{FlowGraph},  which is located in the \textit{org.rhea\_core.internal} package.
 
 \thesissubsection{Stream variables}
 
@@ -434,13 +435,13 @@ In order to evaluate a constructed dataflow graph the strategy design pattern is
 The strategies I have implemented so far follow:
 
 \begin{description}[style=nextline]
-\item[RxJavaEvaluationStrategy\footnote{\url{https://github.com/rhea-flow/rx-eval}}] 
-Uses rxjava\footnote{\url{https://github.com/ReactiveX/RxJava}}, which is a famous and well-maintained library for asynchronous programming using the \textit{Observable} type, which is very close, semantically, to my \textit{Stream} variable.
+\item[RxJavaEvaluationStrategy\site{https://github.com/rhea-flow/rx-eval}] 
+Uses rxjava\site{https://github.com/ReactiveX/RxJava}, which is a famous and well-maintained library for asynchronous programming using the \textit{Observable} type, which is very close, semantically, to my \textit{Stream} variable.
 
-\item[RosEvaluationStrategy\footnote{\url{https://github.com/rhea-flow/ros-eval}}] 
+\item[RosEvaluationStrategy\site{https://github.com/rhea-flow/ros-eval}] 
 Integrates the \textit{ROS} middleware into the framework, by providing the \textit{RosTopic} class, which implements the \textit{AbstractTopic} interface defined in the \textit{org.rhea\_core.io} package. This strategy's job is to set up a \textit{ROS} client and configure every \textit{RosTopic} used within the dataflow that needs to be evaluated to use this client. After that, evaluation is propagated to a generic strategy (e.g. rxjava).
 
-\item[MqttEvaluationStrategy\footnote{\url{https://github.com/rhea-flow/mqtt-eval}}] 
+\item[MqttEvaluationStrategy\site{https://github.com/rhea-flow/mqtt-eval}] 
 Integrates the MQTT middleware into the framework, in the same way \textit{ROS} is intergrated.
 \end{description}
 
@@ -452,7 +453,7 @@ For distribution and cluster management, the strategy design pattern is used aga
 
 \thesissubsubsection{Hazelcast}
 
-Due to the RSS being in its infant stage, no working implementation exists for superimposing a network protocol onto it (e.g. RSS over TCP). For this reason, I relied upon the open-source \textit{Hazelcast} library\footnote{\url{http://hazelcast.org/}} to discover and manage multiple machines and used its internal decentralized PubSub model to communicate intermediate results across the network. Figure 8 illustrates a dataflow graph on the left and the same graph partitioned over several machines on the right.
+Due to the RSS being in its infant stage, no working implementation exists for superimposing a network protocol onto it (e.g. RSS over TCP). For this reason, I relied upon the open-source \textit{Hazelcast} library\site{http://hazelcast.org/} to discover and manage multiple machines and used its internal decentralized PubSub model to communicate intermediate results across the network. Figure 8 illustrates a dataflow graph on the left and the same graph partitioned over several machines on the right.
 
 \twofig{partition1}{partition2}{Partitioning}
 
@@ -510,7 +511,7 @@ At this stage, we identify the aforementioned network distance as cost and apply
 
 As communication between machines across a network is mandatory, data types emitted through the streams must be serialized on departure and de-serialized on arrival at each machine. For this reason, each \textit{DistributionStrategy} must be configured with a class implementing the \textit{Serializer} interface, define in the \textit{org.rhea\_core.serialization} package. The byte representation of the objects is parametric for maximum flexibility. 
 
-A default \textit{Serializer} is provided with the core system, which can serialize every class implementing the \textit{Serializable} interface. In addition to that, the JsonIO library\footnote{\url{https://github.com/jdereg/json-io}} is used which allows serialization of many types of classes, but still does not cover every possible one. Figure 10 depicts the serialization process in more detail.
+A default \textit{Serializer} is provided with the core system, which can serialize every class implementing the \textit{Serializable} interface. In addition to that, the JsonIO library\site{https://github.com/jdereg/json-io} is used which allows serialization of many types of classes, but still does not cover every possible one. Figure 10 depicts the serialization process in more detail.
 
 \mydiag{serialization}{Serialization process}
 
@@ -523,10 +524,60 @@ A default \textit{Serializer} is provided with the core system, which can serial
 
 \thesissection{Related Work}
 
+This section discusses related work in the fields of \textit{Big Data}, \textit{Robotics} and \textit{IoT}.
+
 \thesissubsection{Big Data}
+
+The necessity for implicit parallelism and distribution of more and more applications, dealing with huge and/or complex data, has brought increasingly more attention to the dataflow programming model. Its easy to understand and maintain structure and declarative approach to programming, while not losing expressibility, has attracted many frameworks to utilize it.
+
 \thesissubsubsection{GoogleDataflow}
+
+Google recently released the \textit{GoogleDataflow }framework\site{https://cloud.google.com/dataflow/}, which is an evolution of \textit{FlumeJava}\cite{flumejava}, which in turn is a successor of the famous \textit{MapReduce }framework\cite{mapreduce}.
+
+\textit{MapReduce} was a very simple model that allowed automatic concrrency/distribution on a cluster by allowing only a very minimal program structure. First, the user specifies a \textit{map} function that processes a key/value pair to generate a set of intermediate key/value pairs, and a \textit{reduce} function that merges all intermediate values associated with the same intermediate key. Although it was widely adopted at first, quickly many problems that could not be expressed with the above formalism were found and therefore a more expressive model was required.
+
+This gave birth to \textit{FlumeJava}, which is a generalization of the \textit{MapReduce} framework that allows more expressive pipelines of more primitive operations like \textit{MapReduce}.
+
+Although \textit{FlumeJava} was more attractive due to its expressibility, still the pipeline constructed could not formulate all problems that are needed in some big-data applications. For instance, the constructed dataflow could not contain cycles, which is an integral part of \textit{incremental computation}, used extensively nowadays for machine learning and data analysis.
+
+And this is how \textit{GoogleDataflow} came to exist, offering a fully generic dataflow framework integrated with many other closely-related technologies from Google, like Cloud Storage\site{https://cloud.google.com/storage/}, Cloud PubSub\site{https://cloud.google.com/pubsub/}, Cloud Datastore\site{https://cloud.google.com/datastore/}, Cloud Bigtable\site{https://cloud.google.com/bigtable/} and BigQuery\site{https://cloud.google.com/bigquery/}. 
+
+It is open-source, offers fully automatic resource management that auto-scales for optimal throughput and provides increased reliability and data consistency. Moreover, it provides a unified programming model through its API, while allowing data monitoring and demand-driven execution.
+
 \thesissubsubsection{TensorFlow}
+
+Another dataflow framework from Google is TensorFlow\site{https://www.tensorflow.org/}, which is an open-source polyglot library for machine learning and especially construction of neural networks.
+
+The interesting fact is that, although it started out as a rigid neural network library, it quickly generalized to a dataflow construction library, much similar to my own project, which started out as a robotics library. 
+
+Its main features are its portability to multiple computational architetures (e.g. CPU, GPU, etc...) and multiple language APIs (e.g. C++, Python), although its main advantage is its domain-specific operators for neural nets (i.e. common subgraphs, auto-differentiation).
+
+Though the edges/streams connecting the nodes, only a single but flexible data type is allowed, namely the \textit{Tensor} type, which essentially is a multi-dimensional array that usually represents features or weights. Figure X illustrates a neural network as a dataflow graph.
+
+\myimage{tensorflow}{0.5}{TensorFlow graph}
+
 \thesissubsubsection{Akka}
+
+Definitely one the most mature frameworks for distribution targeting the JVM, \textit{Akka}\site{http://akka.io/} is a toolkit and runtime for highly concurrent, distributed and resilient message-driven applications. It is also one of the founders of the Reactive Streams\cite{rss} initiative.
+
+Its approach follows the Actor model\cite{actor}, where one perceives abstract computational agents, called actors, that are distributed in space and communicate with point-to-point messages that are buffered in a queue. In reaction to a message, an actor can create more actors, make local decisions, send more messages and determine how to respond to the next message received.
+
+Similar to the problem of \textit{ROS} that my framework solved, which is the inappropriate nature of callbacks for complex scenarios, \textit{Akka} developers also felt the same necessity for a more flexible and composable programming model, so they started the AkkaStreams library\site{http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0-M2/scala.html} which provides a convenient API for stream processing and also dataflow graph construction with an interesting DSL. Figure ? demonstrates a dataflow graph on the left, generated by the DSL code on the right.
+
+%\codefig{akka}{akka}{Akka DSL}
+
+	\begin{figure}[h!] 
+		\begin{minipage}[c]{0.5\linewidth} 
+			\input{diagrams/akka.tikz} 
+		\end{minipage}
+		\hfill
+		\begin{minipage}[c]{0.5\linewidth} 
+			\inputminted{scala}{code/akka.scala}	
+		\end{minipage}		
+		\caption{Akka DSL}
+	\end{figure}	
+
+
 \thesissubsubsection{dispel4py}
 \thesissubsubsection{Spark}
 \thesissubsubsection{Naiad}
@@ -571,6 +622,7 @@ A table of all abbrevations used throughout the thesis follows.
   GPU & Graphics Processing Unit \\
   DSL & Domain-specific Language \\
   RSS & Reactive Streams Standard \\
+  API & Application Programming Interface \\
   \hline
 \end{tabularx}
 

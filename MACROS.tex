@@ -38,28 +38,51 @@
 }
 
 % General macros
-\newcommand\mydiag[2]{
+\newcommand\site[1]{\footnote{\url{#1}}}
+
+\newcommand\myimage[3]{
 	\begin{figure}[h!] 
 	\centering
- 	\input{diagrams/#1.tikz}
-  	\caption{#2}
-\end{figure}
+ 	\includegraphics[scale=#2]{#1}
+  	\caption{#3}
+	\end{figure}
+}
+
+\newcommand\codefig[3]{
+	\begin{figure}[h!] 
+		\begin{minipage}[c]{0.5\linewidth} 
+			\input{diagrams/#1.tikz} 
+		\end{minipage}
+		\hfill
+		\begin{minipage}[c]{0.5\linewidth} 
+			\inputminted{code/#2.scala}	
+		\end{minipage}		
+		\caption{#3}
+	\end{figure}	
+}
+
+\newcommand\mydiag[2]{
+	\begin{figure}[h!] 
+		\centering
+	 	\input{diagrams/#1.tikz}
+	  	\caption{#2}
+	\end{figure}
 }
 
 \newcommand\myop[2]{
 	\begin{figure}[h!] 
-	\centering
- 	\input{diagrams/operators/#1.tikz}
-  	\caption{#2}
-\end{figure}
+		\centering
+	 	\input{diagrams/operators/#1.tikz}
+	  	\caption{#2}
+	\end{figure}
 }
 
 \newcommand\twofig[3]{
 	\begin{figure}[h!]
-	\begin{minipage}[c]{0.5\linewidth} \input{diagrams/#1.tikz} \end{minipage}
-	\hfill
-	\begin{minipage}[c]{0.5\linewidth} \input{diagrams/#2.tikz} \end{minipage}
-	\caption{#3}
+		\begin{minipage}[c]{0.5\linewidth} \input{diagrams/#1.tikz} \end{minipage}
+		\hfill
+		\begin{minipage}[c]{0.5\linewidth} \input{diagrams/#2.tikz} \end{minipage}
+		\caption{#3}
 	\end{figure}
 }
 
