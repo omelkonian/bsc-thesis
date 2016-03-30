@@ -86,6 +86,15 @@
 	\end{figure}
 }
 
+\newcommand\myitemNospace[4]{
+	\begin{minipage}[c]{0.4\linewidth}
+	\item[#1] #2 \\
+	\textit{inputs}: #3 \\
+	\textit{output}: #4
+	\end{minipage}
+	\hfill
+	\begin{minipage}[c]{0.4\linewidth} \input{diagrams/operators/#1.tikz}\end{minipage}
+}
 \newcommand\myitem[4]{
 	\begin{minipage}[c]{0.4\linewidth}
 	\item[#1] #2 \\
@@ -95,6 +104,15 @@
 	\hfill
 	\begin{minipage}[c]{0.4\linewidth} \input{diagrams/operators/#1.tikz} \end{minipage}
 	\newline \newline \newline
+}
+
+\newcommand\myitemmNospace[4]{
+	\begin{minipage}[c]{0.4\linewidth}
+	\item[#1] #2 \\
+	\textit{inputs}: #3 \\
+	\textit{output}: #4
+	\end{minipage}
+	\hfill
 }
 
 \newcommand\myitemm[4]{
