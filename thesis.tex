@@ -612,8 +612,6 @@ Below is the classic Talker-Listener ROS example, where one node publishes messa
 
 Its main advantage is that it is stand-alone, so no compiling is necessary, which allows for rapid prototyping.
 
-
-
 \thesissubsection{Internet of Things}
 
 IoT applications often deal with much heterogeneity, due to the variety of sources that different devices introduce. Therefore, a component-based approach suits well to solve this problem and there are some dataflow frameworks that follow that approach.
@@ -638,14 +636,48 @@ Applications called flows, are built immediately on a browser, and can be deploy
 
 \thesissection{Future Work}
 
-\thesissubsection{More evaluation strategies}
+This section discusses interesting topics and ideas for future contribution and extension of the framework.
+
+\thesissubsection{More strategies}
+
+Every component that was initially intended to be replaceable for the sake of flexibility, was implemented using the strategy design pattern. So the definite starting point for contribution would be to implement more concrete strategies.
+
+For evaluation, a good idea would be a low-level implementation in C/C++ to allow compatibility with older/smaller systems, not capable of running the JVM. Additionally, more JVM-based strategies are possible, by using the standard \textit{java.util.Stream} library\site{https://docs.oracle.com/javase/8/docs/api/java/util/stream/package-summary.html}, \textit{Akka Streams} or Scala \textit{Iteratees}\cite{iteratees}.
+
+For distribution, again a more low-level approach written in C/C++ would be beneficial to the variety of systems that are allowed to cooperate freely. Moreover, many frameworks similar to Hazelcast could replace it to allow for easy integration with applications that are already committed to another framework.
+
 \thesissubsection{Dynamic reconfiguration}
+
 \thesissubsection{Advanced network profiling}
-\thesissubsection{DSLs for framework extension}
+
+The current strategy for network profiling is based on \textit{round-trip time (RTT)} which is measured explicitly by pinging from each machine to every other one. As the number of machines increase, calculating the \textit{RTT} becomes extremely expensive and may outweigh the benefits of exploiting network proximity. 
+
+To overcome the aforementioned problem, one could estimate, instead of measuring exactly, the \textit{RTT} with less computationally expensive methods. There has been extensive research on \textit{RTT} estimation for \textit{peer-to-peer (P2P)} networks\cite{rtt_survey}. Most of the methods proposed suffer from the constraint that estimation is calculated on a single machine, therefore introducing a central point of failure. This is highly unsuited for distributed system, there a decentralized approach should be used. One such attractive approach is the \textit{Vivaldi} coordinate system\cite{vivaldi}, which is a simple and lightweight algorithm that assigns synthetic coordinates to hosts such that the distance between the coordinates of two hosts accurately predicts the communication latency between them. The algorithm is completely decentralized (i.e. the same piece of code runs on every host) and experiments show that it achieves a median relative error of 11\%, where the error is characterised by the squared-error function:
+
+\[ E =  \sum_i \sum_j (L_{ij}-||x_i - x_j||)^2  \]
+
+where $L_{ij}$ is the actual RTT between nodes $i$ and $j$ and $||x_i - x_j||$ is the euclidean distance between their coordinates.
+
+
 \thesissubsection{Advanced fault-tolerance}
+
 \thesissubsection{Integration with other technologies}
+
+An issue that should not be neglected is interoperability with other dataflow frameworks mentioned throughout this thesis. Although the usage of \textit{RSS} partly aids that cause, not all frameworks for the JVM support it, especially older ones, and is practically useless concerning non-JVM frameworks.
+
+A nice idea would be an \textit{ExportStrategy} that provides a one-to-one mapping between different dataflow representations. For instance, the \textit{NodeRedExportStrategy} would export a single JSON file ready to be imported into \textit{Node-RED} and deployed immediately. An issue that quickly arises is that of expressibility, meaning that the target platform should be at least as expressible as \textit{RHEA}.
+
 \thesissubsection{Visual language}
+
+The dataflow programming model also provides a very intuitive graphical representation to the structure of the software system being implemented. Thus, a helpful tool would be a graphical environment, where graph construction can be achieved through the user interface and delegate only the stream declaration part to a text editor. Another useful functionality would be clustering together sub-graphs by zooming out to provide clarity in complex systems.
+
 \thesissubsection{Stream reasoning}	
+
+A very helpful extension to any dataflow framework is the ability to reason about, in formal logic, the ever-changing streams of data. This created the need for a new formal logic that is able to capture this flowing notion, which also derived from the new \textit{Semantic Web} field\cite{streaming_world}. Fortunately, various sound and efficient logic formalisms have been deceived recently\cite{pdt_logic,asp}.
+
+Stream reasoning has also been researched in the robotics domain\cite{robot_reasoning}, which led to the development of a stream reasoning framework for \textit{ROS} called \textit{DyKnown}\cite{stream_reasoning}. Integrating \textit{DyKnow} with \textit{RHEA}, as they both can support ROS, would certainly be a meaningful contribution. Figure ? shows the general architecture of the \textit{DyKnow} framework.
+
+\myimage{dyknow}{0.5}{DyKnow architecture}
 
 \thesissection{Conclusions}
 
@@ -670,6 +702,8 @@ A table of all abbreviations used throughout the thesis follows.
   API & Application Programming Interface \\
   MPI & Message Passsing Inteface \\
   JSON & JavaScript Object Notation \\
+  RTT & Round-Trip Time \\ 
+  P2P & Peer-To-Peer \\
   \hline
 \end{tabularx}
 
