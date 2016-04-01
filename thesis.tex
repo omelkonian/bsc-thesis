@@ -644,28 +644,43 @@ Every component that was initially intended to be replaceable for the sake of fl
 
 For evaluation, a good idea would be a low-level implementation in C/C++ to allow compatibility with older/smaller systems, not capable of running the JVM. Additionally, more JVM-based strategies are possible, by using the standard \textit{java.util.Stream} library\site{https://docs.oracle.com/javase/8/docs/api/java/util/stream/package-summary.html}, \textit{Akka Streams} or Scala \textit{Iteratees}\cite{iteratees}.
 
-For distribution, again a more low-level approach written in C/C++ would be beneficial to the variety of systems that are allowed to cooperate freely. Moreover, many frameworks similar to Hazelcast could replace it to allow for easy integration with applications that are already committed to another framework.
+For distribution, again a more low-level approach written in C/C++ (e.g. using \textit{MPI/OpenMP}) would be beneficial to the variety of systems that are allowed to cooperate freely. Moreover, many frameworks similar to Hazelcast could replace it to allow for easy integration with applications that are already committed to another framework.
 
 \thesissubsection{Dynamic reconfiguration}
+
+A definite shortcoming of \textsc{RHEA} is that all configuration takes place initially and remains static throughout execution. This poses a problem for many scenarios, where environment is constantly changing and available resources may be introduced or become obsolete. 
+
+For instance, in a distributed application that controls the behaviour of a \textit{robot swarm} and all communication is done through the WiFi network, a robot may lose signal and become unavailable at runtime. Later on it may rejoin the network, so it is vital that its sensor input and computational power become quickly available to the system. A nice DSL that is used to specify adaptive behaviour in robot navigation can be found on \cite{reconf_robot}.
+
+Apart from robotics, the need for adaptive behaviour of software systems has been evident for a long time\cite{reconf_survey}. There have also been attempts for runtime adaptation of, specifically, stream processing systems, such as the \textit{Flextream} framework\cite{flextream}. 
+
+A JVM-based technology that is relatively easy to integrate into \textit{RHEA} is \textit{HotWave}\cite{reconf_java}, which is an \textit{aspect-oriented programming (AOP)} framework, based on the famous \textit{AspectJ}\site{http://www.eclipse.org/aspectj/} open-source extension of Java, that supports dynamic (re)weaving of previously loaded classes, and ensures that all classes loaded in a JVM can be (re)woven. The contribution idea here is to integrate \textit{HotWave} into the \textit{org.rhea\_core} package and then use it to specify the desired adaptive behaviour for reconfiguring where nodes are executed, what operation they perform, and so forth.
 
 \thesissubsection{Advanced network profiling}
 
 The current strategy for network profiling is based on \textit{round-trip time (RTT)} which is measured explicitly by pinging from each machine to every other one. As the number of machines increase, calculating the \textit{RTT} becomes extremely expensive and may outweigh the benefits of exploiting network proximity. 
 
-To overcome the aforementioned problem, one could estimate, instead of measuring exactly, the \textit{RTT} with less computationally expensive methods. There has been extensive research on \textit{RTT} estimation for \textit{peer-to-peer (P2P)} networks\cite{rtt_survey}. Most of the methods proposed suffer from the constraint that estimation is calculated on a single machine, therefore introducing a central point of failure. This is highly unsuited for distributed system, there a decentralized approach should be used. One such attractive approach is the \textit{Vivaldi} coordinate system\cite{vivaldi}, which is a simple and lightweight algorithm that assigns synthetic coordinates to hosts such that the distance between the coordinates of two hosts accurately predicts the communication latency between them. The algorithm is completely decentralized (i.e. the same piece of code runs on every host) and experiments show that it achieves a median relative error of 11\%, where the error is characterised by the squared-error function:
+To overcome the aforementioned problem, one could estimate, instead of measuring exactly, the \textit{RTT} with less computationally expensive methods. There has been extensive research on \textit{RTT} estimation for \textit{peer-to-peer (P2P)} networks\cite{rtt_survey}. Most of the methods proposed suffer from the constraint that estimation is calculated on a single machine, therefore introducing a central point of failure. This is highly unsuited for distributed system, where a decentralized approach should be used. One such attractive approach is the \textit{Vivaldi} coordinate system\cite{vivaldi}, which is a simple and lightweight algorithm that assigns synthetic coordinates to hosts such that the distance between the coordinates of two hosts accurately predicts the communication latency between them. The algorithm is completely decentralized (i.e. the same piece of code runs on every host) and experiments show that it achieves a median relative error of 11\%, where the error is characterised by the squared-error function:
 
 \[ E =  \sum_i \sum_j (L_{ij}-||x_i - x_j||)^2  \]
 
 where $L_{ij}$ is the actual RTT between nodes $i$ and $j$ and $||x_i - x_j||$ is the euclidean distance between their coordinates.
 
-
 \thesissubsection{Advanced fault-tolerance}
+
+An aspect that \textit{RHEA} is far behind from most of its competing frameworks is fault-tolerance. Although there is a minimal control on \textit{back-pressure}, available through the small provided set of such operators, still there are no advanced methods for specifying behaviour for graceful error-recovery.
+
+The above is essential for large machine clusters, in which systems it is certain that host failures and other faults will be a common occurrence. The functional nature of the dataflow model enables fault-tolerance, in addition to parallelism, due to the fact that a node can be moved to another machine for execution, while preserving the original semantics.
+
+The extension proposed is to first provide low-level functionality for moving nodes across the network at runtime, and then use that to design high-level error recovery mechanisms. The issue confronted here is that, at the current state of the system, everything is configured statically before evaluation. To enable runtime configuration, it is mandatory to refactor major internal components, as previously noted.
+
+This contribution path can draw heavy influence from recent research on fault-tolerance for stream processing engines\cite{borealis,dstreams,wide_area}. These provide efficient models for availability and data recovery/consistency, by using data replication and even parallel recovery of lost state across the cluster.
 
 \thesissubsection{Integration with other technologies}
 
 An issue that should not be neglected is interoperability with other dataflow frameworks mentioned throughout this thesis. Although the usage of \textit{RSS} partly aids that cause, not all frameworks for the JVM support it, especially older ones, and is practically useless concerning non-JVM frameworks.
 
-A nice idea would be an \textit{ExportStrategy} that provides a one-to-one mapping between different dataflow representations. For instance, the \textit{NodeRedExportStrategy} would export a single JSON file ready to be imported into \textit{Node-RED} and deployed immediately. An issue that quickly arises is that of expressibility, meaning that the target platform should be at least as expressible as \textit{RHEA}.
+A nice idea would be an \textit{ExportStrategy} that provides a one-to-one mapping between different dataflow representations. For instance, the \textit{NodeRedExportStrategy} would export a single JSON file ready to be imported into \textit{Node-RED} and deployed immediately. An issue that quickly arises is that of expressibility, meaning that the target platform should be at least as expressible as \textit{RHEA}. This can be solved by providing a mechanism/DSL to specify restricted views of the Stream class, which allow for a subset of the original operation set. 
 
 \thesissubsection{Visual language}
 
@@ -673,7 +688,7 @@ The dataflow programming model also provides a very intuitive graphical represen
 
 \thesissubsection{Stream reasoning}	
 
-A very helpful extension to any dataflow framework is the ability to reason about, in formal logic, the ever-changing streams of data. This created the need for a new formal logic that is able to capture this flowing notion, which also derived from the new \textit{Semantic Web} field\cite{streaming_world}. Fortunately, various sound and efficient logic formalisms have been deceived recently\cite{pdt_logic,asp}.
+A very helpful extension to any dataflow framework is the ability to reason about, in formal logic, the ever-changing streams of data. This creates the need for a new formal logic that is able to capture this flowing notion, which has also troubled the new \textit{Semantic Web} field\cite{streaming_world}. Fortunately, various sound and efficient logic formalisms have been deceived recently\cite{pdt_logic,asp}.
 
 Stream reasoning has also been researched in the robotics domain\cite{robot_reasoning}, which led to the development of a stream reasoning framework for \textit{ROS} called \textit{DyKnown}\cite{stream_reasoning}. Integrating \textit{DyKnow} with \textit{RHEA}, as they both can support ROS, would certainly be a meaningful contribution. Figure ? shows the general architecture of the \textit{DyKnow} framework.
 
@@ -704,6 +719,7 @@ A table of all abbreviations used throughout the thesis follows.
   JSON & JavaScript Object Notation \\
   RTT & Round-Trip Time \\ 
   P2P & Peer-To-Peer \\
+  AOP & Aspect-Oriented Programming \\
   \hline
 \end{tabularx}
 
