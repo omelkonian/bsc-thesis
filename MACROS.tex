@@ -31,8 +31,9 @@
   	machine/.style={draw, fill=myrd!80, rounded corners, thick, inner sep=.5cm},
   	task/.style={draw, fill=mygr!80, rounded corners, thick, inner sep=.5cm},
   	to/.style={->,>=stealth',shorten >=1pt,semithick},
-  	net/.style={to, red, dotted},
+  	net/.style={to, red, dotted},  	
   	opt/.style={->,>=stealth',shorten >=1pt,semithick,draw=red},
+  	point/.style={draw, inner sep=0pt, circle, fill=black},
   	every matrix/.style= 	{ampersand replacement=\&},
   	every node/.style={align=center}
 }
@@ -55,7 +56,7 @@
 		\end{minipage}
 		\hfill
 		\begin{minipage}[c]{0.5\linewidth} 
-			#2 %\scala{code/akka.scala}	
+			#2 
 		\end{minipage}		
 		\caption{#3}
 	\end{figure}
