@@ -1,0 +1,28 @@
+\begin{tikzpicture}
+  [every matrix/.append style={row sep=1.2cm, column sep=.05cm}]
+  \matrix{         
+    \node (A) {}; 
+    \& \node[dataflow] (ble) {\small BLE}; 
+    \& \node (B) {}; \\
+    
+    \node[dataflow] (near) {\small filter\\\small \{near\}}; 
+    \& \& \node[dataflow] (far) {\small filter\\\small \{far\}}; \\
+
+    \node[dataflow] (map) {\small map\\\small \{speed\_up\} }; 
+    \& \& \node[dataflow] (mapp) {\small map\\\small \{slow\_down\}}; \\    
+    \node (C) {}; 
+    \& \node[dataflow] (cmd) {\small robot\\\small command};
+    \& \node (D) {}; \\
+  };
+    
+  \draw[to] (ble) -- (near);
+  \draw[to] (ble) -- (far);
+  \draw[to] (near) -- (map);
+  \draw[to] (far) -- (mapp);
+  \draw[to] (map) -- (cmd);
+  \draw[to] (mapp) -- (cmd);
+
+  % \begin{scope}[on background layer]    
+  % \end{scope}
+
+\end{tikzpicture} 

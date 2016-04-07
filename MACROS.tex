@@ -1,6 +1,7 @@
 % Marble Diagrams
 \newcommand{\op}[1]{
-  	\node[draw,rounded corners,thick,fit={(0,.8)(5,1.2)}]{\newline #1};
+  	\node[draw,rounded corners,thick,fit={(0,.8)(5,1.4)}] (id) {};
+  	\node[anchor=base,inner sep=0pt] at (id.center) {#1};
 }
 \newcommand{\stream}[1]{
 	\draw[->,very thick] (0,#1) -- (5,#1);
@@ -35,7 +36,7 @@
   	opt/.style={->,>=stealth',shorten >=1pt,semithick,draw=red},
   	point/.style={draw, inner sep=0pt, circle, fill=black},
   	every matrix/.style= 	{ampersand replacement=\&},
-  	every node/.style={align=center}
+  	every node/.style={align=center, anchor=base}
 }
 
 % General macros
@@ -129,10 +130,12 @@
 \newcommand\optimization[2]{
 	\begin{figure}[h!]
 
+	\begin{minipage}[c]{0.3\linewidth} 		
+	\end{minipage}
 	\begin{minipage}[c]{0.4\linewidth} 
 		\input{diagrams/optimization/#1B.tikz} 
 	\end{minipage}
-	\begin{minipage}[c]{0.2\linewidth} 
+	\begin{minipage}[c]{0.1\linewidth} 
 		\includegraphics[scale=0.2]{arrow} 
 	\end{minipage}
 	\hfill
@@ -142,3 +145,14 @@
 	\caption{#2}
 	\end{figure}	
 }
+
+% Source Code
+\newmintedfile[hs]{hs}{frame=lines,framesep=0.5cm}
+\newmintedfile[jv]{java}{frame=lines,framesep=0.5cm}
+\newmintedfile[scala]{scala}{frame=lines,framesep=0.5cm}
+\newmintedfile[scalas]{scala}{fontsize=\footnotesize,frame=lines,framesep=0.5cm}
+\usemintedstyle{friendly}
+\newmintedfile[jvs]{java}{fontsize=\footnotesize,frame=lines,framesep=0.5cm}
+\usemintedstyle{friendly}
+\newmintedfile[jvxs]{java}{fontsize=\tiny,frame=lines,framesep=0.5cm}
+\usemintedstyle{friendly}
