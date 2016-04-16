@@ -1,15 +1,15 @@
 \begin{tikzpicture}
       % Publishers
-      \draw [red,fill] (-2.5,0) circle [radius=0.2] node [black,left=4] {Publisher};
-      \draw [red,fill] (-2.5,1) circle [radius=0.2] node [black,left=4] {Publisher};
-      \draw [red,fill] (-2.5,2) circle [radius=0.2] node [black,left=4] {Publisher};
+      \draw [red,fill] (-2.5,0) circle [radius=0.2] node [black,left=0.5] {Publisher};
+      \draw [red,fill] (-2.5,1) circle [radius=0.2] node [black,left=0.5] {Publisher};
+      \draw [red,fill] (-2.5,2) circle [radius=0.2] node [black,left=0.5] {Publisher};
 
       % Broker
-      \draw [fill] (-0.2,0.5) rectangle (0.2, 1.5) node [black,below=-15] {Broker};
+      \draw [fill] (-0.2,0.5) rectangle (0.2, 1.5) node [black,below=1] {Broker};
       
       % Subscribers
-      \draw [orange,fill] (2.5,0.5) circle [radius=0.2] node [black,right=4] {Subscriber};
-      \draw [orange,fill] (2.5,1.5) circle [radius=0.2] node [black,right=4] {Subscriber};
+      \draw [orange,fill] (2.5,0.5) circle [radius=0.2] node [black,right=0.5] {Subscriber};
+      \draw [orange,fill] (2.5,1.5) circle [radius=0.2] node [black,right=0.5] {Subscriber};
       
       % Edges
       \draw [thick] (-2.5,0)

@@ -30,6 +30,9 @@
 % URL
 \usepackage{url}
 
+% TODO notes
+\usepackage[colorinlistoftodos,prependcaption]{todonotes}
+
 \setallmainfonts[Mapping=tex-text]{Arial}
 \setallsansfonts[Mapping=tex-text]{Arial}
 \setallmonofonts[Mapping=tex-text]{Arial}
@@ -62,7 +65,7 @@
 
 \begin{thesisabstract}[Abstract]
 
-The dataflow computational model enables writing highly parallel programs, which will be deployed on a heterogeneous network, in a concise and readable way. The main advantage is the fact that most concurrency and distribution is implicit and little or no responsibility is given to the programmer. The framework proposed in this thesis constitutes the underlying system that make this style of programming possible in JVM-based languages (e.g. Java, Scala, Closure), while at the same time making it easy to integrate other technologies that rely on the PubSub model, in order to move away from imperative languages and enter a higher level of abstraction. Particular emphasis was put on three domains, namely \textit{Big Data}, \textit{Robotics} and \textit{IoT}. A detailed specification of the framework's characteristics and capabilities is given, followed by some robotic applications that demonstrate these attributes. Finally, related work and recent technologies are discussed.
+The dataflow computational model enables writing highly parallel programs, which will be deployed on a heterogeneous network, in a concise and readable way. The main advantage is the fact that the system can be conceptually separated into several independent components that can be run in parallel and deployed on different machines. Therefore, concurrency and distribution is implicit and little or no responsibility is given to the programmer. The framework proposed in this thesis constitutes the underlying system that make this style of programming possible in JVM-based languages (e.g. Java, Scala, Closure), while at the same time making it easy to integrate other technologies that rely on the PubSub model, in order to move away from imperative languages and enter a higher level of abstraction. Particular emphasis was put on three domains, namely \textit{Big Data}, \textit{Robotics} and \textit{IoT}. A detailed specification of the framework's characteristics and capabilities is given, followed by some robotic applications that demonstrate these attributes. Finally, related work and recent technologies are discussed.
 
 \thesiskeywords
 {Subject Area}{Programming Languages}
@@ -93,7 +96,7 @@ I would also like to thank Professor Panos Randogiannis for being a major influe
 
 \begin{thesisprologue}[Prologue]
 
-This bachelor thesis is a continuation of my internship at the National Centre for Scientific Research "Demokritos", particularly in the Software and Knowledge Engineering Laboratory (SKEL). 
+This bachelor thesis is the continuation of my internship at the National Centre for Scientific Research "Demokritos", particularly in the Software and Knowledge Engineering Laboratory (SKEL). 
 
 The main task I was assigned was the implementation of a framework for robot programming using a dataflow approach. During that internship, I came to realize that my work could be easily generalized to cover a much broader application area than just robot software. 
 
@@ -107,20 +110,23 @@ The name of the framework stems from the ancient Greek Titaness Rhea(\textit{Î¡Î
 
 My main contribution is the design and implementation of a framework for dataflow programming to be deployed anywhere, ranging from low-performance robots and sensors to clusters of computer and even the Cloud. 
 
-The main idea is to provide the programmer with a different execution model, the dataflow model, which allows for a more abstract way of thinking and has the advantage of exposing opportunities for parallelism (amongst CPU cores) and distribution (amongst computational machines) that the "intelligent" underlying system can automatically realize. Therefore, the programmer will be able to gain good performance and utilization of the available computational resources, while at the same time reducing development time and cost and maintaining a much cleaner and easier-to-refactor software system.
+The main idea is to provide the programmer with a different execution model, the dataflow model, which allows for a more abstract way of thinking and has the advantage of exposing opportunities for parallelism (amongst CPU cores) and distribution (amongst computational machines), which can then be automatically realised by the "intelligent" underlying system. 
 
+Therefore, the programmer will be able to utilize available computational resources without any effort, while at the same time reducing development time/cost and maintaining a much cleaner and easier-to-refactor software system. Resource utilization may appear in the form of faster execution or more robust error-handling. 
+
+\todo[inline,linecolor=red,backgroundcolor=red!25,bordercolor=red]{Chain of Gain. Introduce running example?}
 
 \thesissubsection{Motivation}
 
 \thesissubsubsection{Declarative languages}
 
-Software is becoming increasingly more complex each year, as computing capabilities are strengthened and user needs become more and more demanding. Thus the need for higher abstraction becomes mandatory, as it provides a more structured, easier to debug and maintainable way of developing software. In other words, abstraction in computer science acts as a mean to overcome complexity. 
+Software is becoming increasingly more complex each year, as computing capabilities are strengthened and user needs become more and more demanding. Thus the need for higher abstraction becomes imperative, as it provides a more structured, easier to debug and maintainable way of developing software. In other words, abstraction in computer science acts as a mean to overcome complexity. 
 
-In programming languages, the level of the aforementioned abstraction is measured regarding the amount of low-level details a programmer has to specify. Therefore, languages can be divided in two categories: the imperative ones, which specify what needs to be done and how to do it, and the declarative ones, which only specify what needs to be done and rely on the underlying compiler/interpreter to produce the exact commands that will realize the desired behaviour. The most well-known declarative programming paradigms are functional and logic programming, each providing higher abstraction in different aspects. My approach was greatly influenced by the functional paradigm.
+In programming languages, the level of the aforementioned abstraction is measured regarding the amount of low-level details a programmer has to specify. Therefore, languages can be divided in two categories: the imperative ones, in which the programmer specifies what needs to be done and how to do it, and the declarative ones, where the programmer only specifies what needs to be done and rely on the underlying compiler/interpreter to produce the exact commands that will realize the desired behaviour. The most well-known declarative programming paradigms are functional and logic programming, each providing higher abstraction in different aspects. My approach was greatly influenced by the functional paradigm.
 
 \thesissubsubsection{Data versus Computation}			
 
-A common problem in heterogeneous systems is that different representations of the same entities/data-types coexist in the same software and, as a consequence, pure computational tasks are intermingled with data-converting tasks. This makes the code less readable and harder to maintain and understand. In the dataflow execution model, there is a clear separation of these two aspects as data (edges) are completely decoupled from computation (nodes). This motivation is strengthened even more, when cross-machine communication is included, and apart from converting data from one representation to another, serialization(i.e. conversion to bytes) is also mandatory.
+A common problem in heterogeneous systems is that different representations of the same entities/data-types coexist in the same software and, as a consequence, pure computational tasks are intermingled with data-converting tasks. This makes the code less readable and harder to maintain and understand. In the dataflow execution model, where the program is modelled as directed graph of data flowing between operations, there is a clear separation of these two aspects as data (edges) are completely decoupled from computation (nodes). This motivation is strengthened even more, when cross-machine communication is included, and apart from converting data from one representation to another, serialization(i.e. conversion to bytes) is also mandatory.
 
 \thesissubsubsection{Dataflows in Robotics}
 
@@ -134,7 +140,7 @@ Moreover, robotics typically involve several different robotic systems, whose co
 
 Another reason for following a dataflow approach is the attention that it recently has drawn in the \textit{Big Data} field. As data size is growing exponentially and distribution is not a luxury but a necessity, a more scalable and decentralized architecture was destined to be examined in more depth. As we will discuss in the \textit{Related Work} chapter, there are many recent frameworks that became famous for their scalability due to the fact that they rely on a dataflow approach.
 
-\thesissubsection{Outline}
+\thesissubsection{Structure of thesis}
 
 There are nine chapters which compose this thesis: \textit{Introduction, Background, Approach, Implementation, Applications, Related Work, Future Work, Conclusions}.
 
@@ -159,10 +165,16 @@ The increased interest in parallelism during the 70's gave rise to the dataflow 
 
 \mydiag{nat}{Natural numbers}	
 
-The main advantage of the dataflow model is its implicit parallelism, deriving from the fact that the computational units are totally independent and therefore can be executed in parallel. The communication can either occur through an in-memory data storage or even a TCP connection across the network. Its great flexibility and composability makes it a good candidate for the underlying architecture of a framework with a high level of abstraction.
+The main advantage of the dataflow model is its implicit parallelism, deriving from the fact that the computational units are totally independent and therefore can be executed in parallel. A possible single-machine implementation could represent edges as in-memory data storage, whereas a multi-machine one could represent them as channels between TCP sockets, allowing communication across the network. Its great flexibility and composability makes it a good candidate for the underlying architecture of a framework with a high level of abstraction.
 
 \thesissubsection{Functional reactive programming}
-A relatively recent model of programming is \textit{Functional Reactive Programming (FRP)}, which provides a conceptual framework for implementing reactive(i.e. time-varying and responding to external stimuli) behaviour in \textit{hybrid systems} (i.e. containing both continuous and discrete components), such as robots, in functional programming languages. It first appeared as a composable library for graphic animations \cite{fran}, but quickly evolved into a generic paradigm \cite{survey_frp,real_frp,pushpull_frp}. Moreover, extensive research has investigated \textit{FRP} as a framework for robotics \cite{arrows_robots,lambda_in_motion}. \\
+
+A relatively recent programming paradigm is \textit{Functional Reactive Programming (FRP)}, which provides a conceptual framework for implementing reactive (i.e. time-varying and responding to external stimuli) behaviour in \textit{hybrid systems} (i.e. containing both continuous and discrete components), such as robots, in functional programming languages. 
+
+To implement such systems in conventional imperative languages, one must use asynchronous \textit{callbacks} (i.e. each change is handled by a registered \textit{callback} function). Although this solution is satisfactory for simple schemes, more complex scenarios eventually lead to highly incoherent code structure, often called \textit{spaghetti code}, in the sense that control rapidly moves between disconnected parts of the system, similar to the notorious \textit{GOTO} command. This phenomenon stems from the unary nature of \textit{callback} functions, which requires some kind of "internal plumbing" in order to achieve 	mechanisms for handling combination of changes (e.g. when multiple changes occur simultaneously). \textit{FRP} provides a solution to this shortcoming of \textit{callback} functions, because changes are represented as variables (\textit{signals}), which can be passed as parameters to arbitrary functions that use them, called \textit{signal functions}.
+
+\textit{FRP} first appeared as a composable library for graphic animations \cite{fran}, but quickly evolved into a generic paradigm \cite{survey_frp,real_frp,pushpull_frp}. Moreover, extensive research has investigated \textit{FRP} as a framework for robotics \cite{arrows_robots,lambda_in_motion}. 
+
 Although appealing at first, \textit{FRP} was not appropriate for systems  with real-time constraints, due to uncontrollable time- and space- leaks \cite{event_frp}. The solution was a generalization of monads called \textit{arrows} \cite{arrows}, which provided the necessary guarantees that the aforementioned common errors do not occur. Let's see the example of calculating a robot's x-coordinate. Here is the mathematical formula drawn from control theory:
 
 $$ x = 1/2 \int (vr + vl) \cos\theta $$ 
@@ -175,12 +187,11 @@ As the above may seem counter-intuitive and difficult to understand, a new notat
 
 \hs{code/frp2.hs}
 
-The main advantages of \textit{FRP} are its close correspondence to mathematics, which make it an ideal framework for modelling real-time systems, and its concise representation of time-varying values via \textit{signals}. \\
-For a more detailed view of the \textit{FRP} idiom and all of its variants please see the cited literature.
+The main advantages of \textit{FRP} are its close correspondence to mathematics\cite{survey_frp}, which make it an ideal framework for modelling real-time systems, and its concise representation of time-varying values via \textit{signals}.
 
 \thesissubsection{Publish-Subscribe model}
 
-\textit{Publish/Subscribe (PubSub)} is a communication paradigm that became popular due to the loose coupling of its components, suited for the most recent large-scale distributed applications.
+\textit{Publish/Subscribe (PubSub)} is a messaging pattern that became popular due to the loose coupling of its components, suited for the most recent large-scale distributed applications.
 
 There is no point-to-point communication and no synchronization. \textit{Publishers} advertise messages of a given type to a specific message class or \textit{topic} that is identified by a \textit{keyword}, whereas \textit{subscribers} listen on a specific \textit{topic} without any knowledge of who the publishers are. The component responsible for relaying the messages between machines and/or processes and finding the cheaper dissemination method is called the \textit{message broker}. Figure 2 illustrates an abstract representation of the \textit{PubSub} model.
 
@@ -188,7 +199,7 @@ There is no point-to-point communication and no synchronization. \textit{Publish
 
 \thesissubsection{ROS: Robot Operating System}
 
-\textit{ROS} is an open-source middleware for robot software, which emphasizes large-scale integrative robotics research \cite{ROS}. It provides a \textit{thin} communication layer between heterogeneous computers, from robots to mainframes and it has been widely adopted by the research community around the world, due to its flexibility and maximal support of reusability through packaging and composability. It provides a nice solution to the development complexity introduced by complex robot applications that consist of several modules and require different device drivers for each individual robot. 
+\textit{ROS} is an open-source middleware for robot software, which emphasizes large-scale integrative robotics research \cite{ROS}. It provides a \textit{thin} communication layer between heterogeneous computers, from robots to mainframes and it has been widely adopted by the research community around the world, due to its flexibility and maximal support of reusability through packaging and composability. It provides a compact solution to the development complexity introduced by complex robot applications that consist of several modules and require different device drivers for each individual robot. 
 
 It follows a peer-to-peer network topology, implemented using a topic-based \textit{PubSub} messaging protocol and its architecture reflects many sound design principles. Another great property of \textit{ROS} is that it is language-agnostic, meaning that only a minimal specification language for message transaction has been defined, so contributors are free to implement small-size clients in different programming languages, with \textit{roscpp} and \textit{rospy} being the most widely used ones.
 
