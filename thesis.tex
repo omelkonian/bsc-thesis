@@ -165,13 +165,17 @@ The increased interest in parallelism during the 70's gave rise to the dataflow 
 
 \mydiag{nat}{Natural numbers}	
 
+In the dataflow graph above, we can discern three types of nodes: sources, which do not have any incoming edge and act as value generators to initiate computation, sinks, which do not have any outgoing edges and inner nodes, which transform one or more incoming streams and redirect their output to other nodes. The \textit{zero} node just produces a stream with a single value 0 and then terminates. \textit{Concat} produces a single stream by concatenating the stream produced by \textit{zero} and \textit{increment}, while \textit{increment} transforms its input stream by adding one to its values. Finally, the sink node displays the result, which is the stream of natural numbers.
+
+Streams can be infinite, such as the stream produced by \textit{concat} because it is the concatenation of a single-value stream and an infinite one. Moreover, the graph is cyclic as \textit{concat} feeds input to \textit{increment} and vice versa. The most interesting fact is that there nodes are independent and therefore can run in parallel. For instance, while \textit{increment} is processing value 5 (i.e. to produce value 6), the previous result (i.e. value 5) passes through \textit{concat} to reach the sink node, which can concurrently process it to display it. 
+
 The main advantage of the dataflow model is its implicit parallelism, deriving from the fact that the computational units are totally independent and therefore can be executed in parallel. A possible single-machine implementation could represent edges as in-memory data storage, whereas a multi-machine one could represent them as channels between TCP sockets, allowing communication across the network. Its great flexibility and composability makes it a good candidate for the underlying architecture of a framework with a high level of abstraction.
 
 \thesissubsection{Functional reactive programming}
 
 A relatively recent programming paradigm is \textit{Functional Reactive Programming (FRP)}, which provides a conceptual framework for implementing reactive (i.e. time-varying and responding to external stimuli) behaviour in \textit{hybrid systems} (i.e. containing both continuous and discrete components), such as robots, in functional programming languages. 
 
-To implement such systems in conventional imperative languages, one must use asynchronous \textit{callbacks} (i.e. each change is handled by a registered \textit{callback} function). Although this solution is satisfactory for simple schemes, more complex scenarios eventually lead to highly incoherent code structure, often called \textit{spaghetti code}, in the sense that control rapidly moves between disconnected parts of the system, similar to the notorious \textit{GOTO} command. This phenomenon stems from the unary nature of \textit{callback} functions, which requires some kind of "internal plumbing" in order to achieve 	mechanisms for handling combination of changes (e.g. when multiple changes occur simultaneously). \textit{FRP} provides a solution to this shortcoming of \textit{callback} functions, because changes are represented as variables (\textit{signals}), which can be passed as parameters to arbitrary functions that use them, called \textit{signal functions}.
+To implement such systems in conventional imperative languages, one must use asynchronous \textit{callbacks} (i.e. each change is handled by a registered \textit{callback} function). Although this solution is satisfactory for simple schemes, more complex scenarios eventually lead to highly incoherent code structure, often called \textit{spaghetti code}, in the sense that control rapidly moves between disconnected parts of the system, similar to the notorious \textit{GOTO} command. This phenomenon stems from the unary nature of \textit{callback} functions, which requires some kind of "internal plumbing" in order to achieve 	mechanisms for handling combination of changes (e.g. when multiple changes occur simultaneously). \textit{FRP} provides a solution to this shortcoming of \textit{callback} functions, because changes are represented as variables (\textit{signals}), which can be passed as parameters to arbitrary functions, called \textit{signal functions}.
 
 \textit{FRP} first appeared as a composable library for graphic animations \cite{fran}, but quickly evolved into a generic paradigm \cite{survey_frp,real_frp,pushpull_frp}. Moreover, extensive research has investigated \textit{FRP} as a framework for robotics \cite{arrows_robots,lambda_in_motion}. 
 
@@ -205,27 +209,25 @@ It follows a peer-to-peer network topology, implemented using a topic-based \tex
 
 A typical development scenario is to write several \textit{nodes}, that subscribe to some topics and, after doing some computation, publish their results on other topics. The main architectural issue here is that subscribing is realized through asynchronous callback functions, so complicated schemes easily lead to unstructured code, which obviously lead to unreadable and hard-to-maintain code. My approach gives a solution to the aforementioned problem.
  
-\thesissubsection{Internet of things}
+\thesissubsection{Internet of things - MQTT}
 
 The birth of the Internet gave rise to a concept called \textit{Internet of Things (IoT)}, which is essentially the ability of many heterogeneous devices, ranging from low-cost sensors to vehicles with embedded electronics, to collect data and exchange it amongst themselves using the Internet. This gave rise to smart grids, smart homes and eventually smart cities. 
 
-The development of such systems though, due to their heterogeneity, is rather complex and costly. Typical software architectures were not meant to be used in such environments and therefore new tools and concepts needed to be invented. 
+The development of such systems though, due to their heterogeneity, is rather complex and costly. Typical software architectures were not meant to be used in such environments and therefore new tools and concepts needed to be invented. Recent development of a variety of middleware frameworks, showed that a standard protocol of communication is imperative along with supporting tools\cite{iot_middleware}. The most widely spread protocol is \textit{MQTT}, which follows the \textit{PubSub} messaging pattern and provides a very minimal communication layer in order not to put a strain on the resource-bounded system\cite{mqtt}. 
 
-Fortunately, the dataflow model seems to be rather fitting for these scenarios, as every node in the graph is completely independent, and consequently can be any "\textit{thing}". This useful property of the model makes it a good architectural choice for such applications. The only thing to consider is how these things will communicate in a standard way, so as to be able to add new types of \textit{things} and integrate it in an effortless way to an existing dataflow network.
+For instance, an \textit{IoT} application could connect to some sensors by subscribing to their corresponding topics, taking decisions that would result in some commands to some actuators, by publishing to their corresponding topics.
 
-\thesissubsection{The Strategy design pattern}
+Fortunately, the dataflow model seems to be rather fitting for these scenarios\cite{iot_dataflow}, as every node in the graph is completely independent, and consequently can be any "\textit{thing}". This useful property of the model makes it a good architectural choice for such applications. The only thing to consider is how these things will communicate in a standard way, so as to be able to add new types of \textit{things} and integrate it in an effortless way to an existing dataflow network.
 
-In software engineering, and especially in \textit{object-oriented programming (OOP)}, a \textit{design pattern} is a general repeatable solution to a commonly occurring problem in software design \cite{design}.
+\thesissubsection{The Reactive Streams Standard}
 
-One such solution, the \textit{Strategy} design pattern is used when a particular algorithm can be implemented by a variety of behaviours/classes \cite{design}. In such a case, a good idea is to isolate the algorithm in a separate \textit{interface} and allow the system to select the appropriate instantiating classes at runtime.
+\textit{PubSub} is widely used by different frameworks but still lacks standardization. The \textit{Reactive Streams Standard (RSS)} is an initiative to provide a standard for asynchronous stream processing with non-blocking back pressure. This encompasses efforts aimed at runtime environments (JVM and JavaScript) as well as network protocols \cite{rss}.
 
-Figure 3 illustrates the basic UML diagram of the strategy design pattern.
+\textit{RSS} defines two minimal interfaces for the roles of \textit{Subscriber}\site{http://www.reactive-streams.org/reactive-streams-1.0.0-javadoc/org/reactivestreams/Subscriber.html} and \textit{Publisher}\site{http://www.reactive-streams.org/reactive-streams-1.0.0-javadoc/org/reactivestreams/Publisher.html}. A \textit{Subscriber} implementation should define reactions to observed values, including normal and erroneous termination, whereas a \textit{Publisher} implementation should accept requests from \textit{Subscribers} and start emitting values to them.
 
-\begin{figure}[h!] 
-	\centering
-	\includegraphics[scale=0.1]{strategy}
-  	\caption{Strategy design pattern}
-\end{figure}
+Below we see a minimal example of using \textit{RSS} to define a publisher that emits values 1..10 and a subscriber that prints all observed values and finally connect them together.
+
+\jvs{code/rss.java}
 
 \thesissection{Approach}
 The design was heavily influenced by principles set out by the FRP and dataflow models. 
@@ -246,7 +248,7 @@ The system is \textit{message-driven}, meaning it relies solely on asynchronous 
 
 \thesissubsection{Heterogeneous}
 
-One of the major concerns while designing the framework was the ability to deploy it anywhere, from low-cost robots to mainframes. Obviously, such attribute would require a very flexible runtime environment. To satisfy this requirement, the strategy design pattern was used for evaluation, meaning that the core system only builds the internal representation of the dataflow graph and partitions it across the available computational resources. From there onwards, each partial graph can be evaluated by a different \textit{EvaluationStrategy} (see Implementation chapter), which could interpret it using the Java 8 Streams library or even compile into CUDA code for execution on a GPU.
+One of the major concerns while designing the framework was the ability to deploy it anywhere, from low-cost robots to mainframes. Obviously, such attribute would require a very flexible runtime environment. To satisfy this requirement, the strategy design pattern was used for evaluation, meaning that the core system only builds the internal representation of the dataflow graph and partitions it across the available computational resources. From there onwards, each partial graph can be evaluated by a different \textit{EvaluationStrategy} (see Implementation chapter), which could interpret it using the Java 8 Streams library\cite{java8} or even compile into CUDA code for execution on a GPU.
 
 Figure 5 illustrates a simple example of a robot application pipeline, where input to the dataflow graph is what the robot's camera senses and, after some image processing and some computation-heavy decision making, a command to an actuator of the robot is executed. Orange nodes are deployed on the robot's on-board computer, the green node is deployed on an off-board GPU and the red node is deployed on the main server.
 
@@ -254,7 +256,7 @@ Figure 5 illustrates a simple example of a robot application pipeline, where inp
 
 \thesissubsection{Extensible}
 
-While doing my internship at \textit{NCSR}, I realized that the goal I was pursuing was impossible to reach closure in a 6-month period by a mere undergraduate student. Therefore, I decided that everything should be implemented in a way that will allow future contribution. 
+While doing my internship at \textit{NCSR}, I realized that the goal I was pursuing was impossible to reach closure in a 6-month period by a mere undergraduate student. Therefore, I decided that everything should be implemented in a way that will allow future contributions. 
 
 With that concept in mind, I started generalizing and abstracting away everything I had done so far with the hope that the framework will raise attention later on. I can now say I am satisfied with the level of abstraction the core system has reached and I hope the stressful refactoring that the framework went through will blossom in the form of future contributions.
 
@@ -265,11 +267,25 @@ The framework is \textit{abstract} in terms of implementation details, as it is 
 \thesissection{Implementation}
 This section examines the major characteristics of the framework's implementation.
 
+\thesissubsection{The Strategy design pattern}
+
+In software engineering, and especially in \textit{object-oriented programming (OOP)}, a \textit{design pattern} is a general repeatable solution to a commonly occurring problem in software design \cite{design}.
+
+One such solution, the \textit{Strategy} design pattern is used when a particular algorithm can be implemented by a variety of behaviours/classes \cite{design}. In such a case, a good idea is to isolate the algorithm in a separate \textit{interface} and allow the system to select the appropriate instantiating classes at runtime.
+
+Figure 3 illustrates the basic UML diagram of the strategy design pattern.
+
+\begin{figure}[h!] 
+	\centering
+	\includegraphics[scale=0.1]{strategy}
+  	\caption{Strategy design pattern}
+\end{figure}
+
 \thesissubsection{Notifications}
 Every value passed through the framework's \textit{streams} is wrapped inside a \textit{Notification} object, which discriminated stream values into three categories: \textit{onNext} (when the stream provides a regular value), \textit{onError} (when an error occurs) and \textit{onComplete} (when the stream completes its output).
 
-\thesissubsection{The Reactive Streams Standard}
-In order to make the framework easy to integrate with other stream and/or dataflow technologies, I decided that every input/output node (i.e. publisher/subscriber in the \textit{PubSub} terminology or source/sink in the dataflow terminology) should implement the interfaces that the \textit{Reactive Streams Standard (RSS)} define. \textit{RSS} is an initiative to provide a standard for asynchronous stream processing with non-blocking back pressure. This encompasses efforts aimed at runtime environments (JVM and JavaScript) as well as network protocols \cite{rss}.
+\thesissubsection{External Input-Output}
+In order to make the framework easy to integrate with other stream and/or dataflow technologies, I decided that every input/output node (i.e. publisher/subscriber in the \textit{PubSub} terminology or source/sink in the dataflow terminology) should implement the interfaces that \textit{RSS} defines.
 
 A sink node (output) should implement the Subscriber interface \site{http://www.reactive-streams.org/reactive-streams-1.0.0-javadoc/org/reactivestreams/Subscriber.html}, which essentially defines three methods corresponding to reactions to a \textit{Notification}, one for each of the categories mentioned above. 
 
@@ -506,7 +522,7 @@ Consider the problem of enumerating the \textit{Hamming numbers}, which are gene
 
 \codefig{hamming}{\scalas{code/hamming.scala}}{Hamming numbers}
 
-The code is written in Scala to utilize the \textit{Pimp my library} design pattern\cite{pimp}, which is used to easily add new functions to already existing libraries. In the example above, we define two new Stream operators, namely \textit{multiply}, which just multiplies the stream with a constant, and \textit{mergeSort}, which produces an ordered stream given two ordered streams as input. We also see the incredible power of the loop operator which allows us to define cycles in an effortless manner.
+The code is written in Scala to utilize the \textit{Pimp my library} design pattern\cite{pimp}, which is used to easily add new functions to already existing libraries, using Scala's \textit{implicit conversions} (line 28). In the example above, we define two new Stream operators, namely \textit{multiply} (line 10), which just multiplies the stream with a constant, and \textit{mergeSort} (line 13), which produces an ordered stream given two ordered streams as input. We also see the power of the \textit{loop} operator (line 2), which allows us to define cycles in an effortless manner.
 
 \thesissubsection{Camera surveilance}
 
@@ -516,25 +532,25 @@ The camera should send frames to be displayed on the screen, only when motion is
 
 \codefig{surveillance}{\jvs{code/surveillance.java}}{Camera surveillance}
 
-In the code above, we can see how easy it is to view a \textit{ROS} topic as a stream, using the \textit{RosEvaluationStrategy}. Moreover, there is a nice separation between program logic (top part where we declare the stream) and implementation details (\textit{motionDetected} function on the bottom).
+In the code above, we can see how easy it is to view a \textit{ROS} topic as a stream, using the \textit{RosEvaluationStrategy} (line 3). Moreover, there is a nice separation between program logic (stream declaration in lines 6-17) and implementation details (\textit{motionDetected} function in line 19).
 
 \thesissubsection{Robot control panel}
 
 This application concerns real-time monitoring of a robot, that is publishing its information and sensor-data to \textit{ROS} topics, through a \textit{graphical user interface (GUI)}.
 
-The \textit{/camera/rgb} topic provides the frames of the robot's amera as coloured images, while the \textit{/camera/depth} provides frames that provide depth information. The \textit{/tf} topic publishes parent-child relations of the internal topics of the robot's configuration, and finally the \textit{/scan/} topic provides information from the robot's laser that gives horizontal depth information in polar coordinates.
+The \textit{/camera/rgb} topic provides the frames of the robot's camera as coloured images, while the \textit{/camera/depth} provides frames that provide depth information. The \textit{/tf} topic publishes parent-child relations of the internal topics of the robot's configuration, and finally the \textit{/scan/} topic provides information from the robot's laser that gives horizontal depth information in polar coordinates.
 
 The GUI displays the laser data embedded on the camera stream, while allowing for real-time face detection. Additionally, it displays the depth frames and the \textit{tf} relations as a tree. Finally, a mock-up battery bar is displayed to show-case the framework's ability for simulation. Figure 26 illustrates the dataflow solution to the above problem on the left and the corresponding \textit{RHEA} code on the right.
 
 \codefig{control_panel}{\jvs{code/control_panel.java}}{Robot control panel}
 
-The implementation details (i.e. the visualization class and the methods \textit{faceDetect}, \textit{embedLaser} and \textit{toGray}) are not shown for brevity's sake. It is evident that this model of programming encourages a clean separation of concerns between the individual components, namely between the sensor data manipulation and the actual visualization on the GUI. 
+The implementation details (i.e. the visualization class and methods \textit{faceDetect}(line 7), \textit{embedLaser}(line 8) and \textit{toGray}(line 26)) are not shown for brevity's sake. It is evident that this model of programming encourages a clean separation of concerns between the individual components, namely between the sensor data manipulation and the actual visualization on the GUI. 
 
 \thesissubsection{Robot hospital guide}
 
 As a final example, we will examine a more IoT-based application. Consider a robot that guides patients to different parts of a hospital, such as the gym or cafeteria. Assuming map localization , path finding and obstacle avoidance are already implemented, there still remains a problem with calibrating the robot's speed according to the patient's status. 
 
-To keep tract of the patient's distance from the robot, each patient carries a smart-phone that acts as a \textit{bluetooth low-enery (BLE) beacon}. The robot uses its bluetooth receiver to publish the distance from the signal source to an \textit{MQTT} topic, which is then transformed by our stream application to velocity commands for the robot, in the form of slowing down or speeding up.
+To keep tract of the patient's distance from the robot, each patient carries a smart-phone that acts as a \textit{bluetooth low-energy (BLE) beacon}. The robot uses its bluetooth receiver to publish the distance from the signal source to an \textit{MQTT} topic, which is then transformed by our stream application to velocity commands for the robot, in the form of slowing down or speeding up.
 
 The first module constitutes the main program logic, where a declared dataflow graph acts as a stream transformation from beacon information to velocity commands to the robot. Figure 27 shows the dataflow graph on the left and the corresponding \textit{RHEA} code on the right.
 
@@ -554,7 +570,7 @@ This section discusses related work in the fields of \textit{Big Data}, \textit{
 
 \thesissubsection{Big Data}
 
-The necessity for implicit parallelism and distribution of more and more applications, dealing with huge and/or complex data, has brought increasingly more attention to the dataflow programming model. Its easy to understand and maintain structure and declarative approach to programming, while not losing expressibility, has attracted many frameworks to utilize it.
+The necessity for implicit parallelism and distribution of more and more applications, dealing with huge and/or complex data, has brought increasingly more attention to the dataflow programming model. The main reason many frameworks have adopted it, is the high level of abstraction it provides with its declarative approach, making it simple to structure and maintain a complex system, while at the same time not losing its expressive power.
 
 \thesissubsubsection{GoogleDataflow}
 
@@ -595,7 +611,7 @@ Similar to the problem of \textit{ROS} that my framework solved, which is the in
 
 \thesissubsubsection{Spark}
 
-A very well-known and well-adapted framework for scalable large-data processing is Apache's \textit{Spark}\site{http://spark.apache.org/}. It was developed to overcome the shortcomings of the \textit{MapReduce} framework mentioned above, providing a much more efficient and flexible runtime.
+A very well-known and well-adapted framework for scalable large-data processing is Apache's \textit{Spark}\site{http://spark.apache.org/}. It was developed to overcome the shortcomings of the \textit{MapReduce} framework mentioned in section 6.1.1, providing a much more efficient and flexible runtime.
 
 It follows the same general approach as \textit{RHEA}, meaning that it is completely generic and encourages domain-specific libraries to be built upon it. For instance, \textit{MLib}\site{http://spark.apache.org/mllib/} is a library for machine learning and \textit{GraphX}\site{http://spark.apache.org/graphx/} is a library for iterative graph algorithms, both stacked upon \textit{Spark}.
 
@@ -689,7 +705,7 @@ For distribution, again a more low-level approach written in C/C++ (e.g. using \
 
 A definite shortcoming of \textit{RHEA} is that all configuration takes place initially and remains static throughout execution. This poses a problem for many scenarios, where environment is constantly changing and available resources may be introduced or become obsolete. 
 
-For instance, in a distributed application that controls the behaviour of a \textit{robot swarm} and all communication is done through the WiFi network, a robot may lose signal and become unavailable at runtime. Later on it may rejoin the network, so it is vital that its sensor input and computational power become quickly available to the system. A nice DSL that is used to specify adaptive behaviour in robot navigation can be found on \cite{reconf_robot}.
+For instance, in a distributed application that controls the behaviour of a \textit{robot swarm} and all communication is done through a \textit{wireless local area network (WLAN)}, a robot may lose signal and become unavailable at runtime. Later on it may rejoin the network, so it is vital that its sensor input and computational power become quickly available to the system. A nice DSL that is used to specify adaptive behaviour in robot navigation can be found on \cite{reconf_robot}.
 
 Apart from robotics, the need for adaptive behaviour of software systems has been evident for a long time\cite{reconf_survey}. There have also been attempts for runtime adaptation of, specifically, stream processing systems, such as the \textit{Flextream} framework\cite{flextream}. 
 
@@ -745,7 +761,9 @@ Figure 36 illustrates all the pluggable components of the framework around the c
 
 \mydiag{core}{The \textit{RHEA} ecosystem}
 
-The applications demonstrated the framework's ability to provide a higher level of abstraction, where the language only specifies how different components coordinate, without knowledge of the implementation details. This is a general notion in computer science, owning its existence to the fact that the problems we are facing are getting increasingly more complex, while resources meet certain realistic bounds, and therefore a higher abstraction layer is mandatory for maintaining readability, efficiency and expressibility.
+The applications demonstrated the framework's ability to provide a higher level of abstraction, where the language only specifies how different components coordinate, without knowledge of the implementation details. This is exactly what \textit{Ziria} accomplishes in the domain of wireless systems programming\cite{ziria}. The driving force for both frameworks (i.e. \textit{RHEA} and \textit{Ziria}) is that some specific domains have fixated their methods on low-level programming, whereas more satisfactory paradigms can solve many shortcomings.
+
+This is a general notion in computer science, owning its existence to the fact that the problems we are facing are getting increasingly more complex, while resources meet certain realistic bounds, and therefore a higher abstraction layer is mandatory for maintaining readability, efficiency and expressibility.
 
 \begin{thesisabbreviations}
 A table of all abbreviations used throughout the thesis follows.
@@ -772,6 +790,7 @@ A table of all abbreviations used throughout the thesis follows.
   P2P & Peer-To-Peer \\
   AOP & Aspect-Oriented Programming \\
   GUI & Graphical User Interface \\
+  WLAN & Wireless Local Area Network \\
   \hline
 \end{tabularx}
 

@@ -23,7 +23,7 @@ Stream.from(new RosTopic<>("/tf"))
       }})
     .subscribe(viz::displayTF);
 Stream.<Image>from(new RosTopic<>("/camera/depth"))
-      .map(ControlPanel::toGray)
+      .map(this::toGray)
       .sample(100, TimeUnit.MILLISECONDS)
       .subscribe(viz::displayDepth);
 Stream.interval(2, TimeUnit.SECONDS)
