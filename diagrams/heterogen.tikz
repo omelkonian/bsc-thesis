@@ -9,8 +9,8 @@
   \tikzstyle{every node}=[font=\small]
   \node[concept] {robot\\camera}
     child[concept color=orange, grow=right]{ node[concept]{compress}
-      child[concept color=green, grow=right]{ node[concept]{image\\processing} 
-        child[concept color=red, grow=right]{  node[concept]{decision}
+      child[concept color=mygr, grow=right]{ node[concept]{image\\processing} 
+        child[concept color=myrd, grow=right]{  node[concept]{decision}
           child[concept color=orange, grow=right]{ node[concept]{robot\\command} } 
         } 
       }

@@ -47,6 +47,7 @@
 	\centering
  	\includegraphics[scale=#2]{#1}
   	\caption{#3}
+  	\label{fig:#1}
 	\end{figure}
 }
 
@@ -60,6 +61,7 @@
 			#2 
 		\end{minipage}		
 		\caption{#3}
+		\label{fig:#1}
 	\end{figure}
 }
 
@@ -68,6 +70,7 @@
 		\centering
 	 	\input{diagrams/#1.tikz}
 	  	\caption{#2}
+	  	\label{fig:#1}
 	\end{figure}
 }
 
@@ -85,6 +88,7 @@
 		\hfill
 		\begin{minipage}[c]{0.5\linewidth} \input{diagrams/#2.tikz} \end{minipage}
 		\caption{#3}
+		\label{fig:#1}
 	\end{figure}
 }
 
@@ -143,6 +147,7 @@
 		\input{diagrams/optimization/#1A.tikz} 
 	\end{minipage}
 	\caption{#2}
+	\label{fig:#1}
 	\end{figure}	
 }
 
