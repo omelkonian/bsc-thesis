@@ -18,7 +18,7 @@
 \definecolor{myrd}{HTML}{B60005}
 \definecolor{mybl}{HTML}{00706C}\definecolor{mygr}{HTML}{079500}
 \definecolor{mybr}{HTML}{B85200}
-\colorlet{myye}{yellow!30}
+\colorlet{myye}{yellow!20}
 
 % Images
 \usepackage{multicol}
@@ -235,15 +235,15 @@ The design was heavily influenced by principles set out by the FRP and dataflow 
 
 \thesissubsection{Reactive}
 
-The system is \textit{reactive}, as close as possible to the definition of the Reactive Manifesto \cite{manifesto}. 
+The system should be \textit{reactive}, as close as possible to the definition of the Reactive Manifesto \cite{manifesto}. 
 
-The system is \textit{responsive}, meaning it should be able to handle time-sensitive scenarios if at all possible. This is the cornerstone of usability and utility, but more than that, it enables quick error-detection and error-handling.
+The system should be \textit{responsive}, meaning it should be able to handle time-sensitive scenarios if at all possible. This is the cornerstone of usability and utility, but more than that, it enables quick error-detection and error-handling.
 
-The system is \textit{resilient}, meaning it is able to recover robustly and gracefully after a failure, due to the fact that nodes in the dataflow graph are completely independent and recovery of each one can be done in isolation. Another thing to note here is that special error messages are built-in and make it very easy to propagate errors between \textit{components}, in case the error-handling part of a component is decoupled from the computational logic. This leads to much more robust architectures for large-scale systems, where fault-tolerance is mission-critical.
+The system should be \textit{resilient}, meaning it is able to recover robustly and gracefully after a failure, due to the fact that nodes in the dataflow graph are completely independent and recovery of each one can be done in isolation. Another thing to note here is that special error messages are built-in and make it very easy to propagate errors between \textit{components}, in case the error-handling part of a component is decoupled from the computational logic. This leads to much more robust architectures for large-scale systems, where fault-tolerance is mission-critical.
 
-The system is \textit{elastic}, meaning it will adjust itself depending on the available resources and demanded workload. For instance, the granularity of the graph (i.e. number of nodes) is adjusted so as to match a heuristic-based value (e.g. total number of threads).
+The system should be \textit{elastic}, meaning it will adjust itself depending on the available resources and demanded workload. For instance, the granularity of the graph (i.e. number of nodes) is adjusted so as to match a heuristic-based value (e.g. total number of threads).
 
-The system is \textit{message-driven}, meaning it relies solely on asynchronous message-passing for inter-component communication leading to loose coupling, isolation, location transparency and the error propagation mentioned above. Location transparency is critical to preserve the semantics whether on a single host or a machine cluster. 
+The system should be \textit{message-driven}, meaning it relies solely on asynchronous message-passing for inter-component communication leading to loose coupling, isolation, location transparency and the error propagation mentioned above. Location transparency is critical to preserve the semantics whether on a single host or a machine cluster. 
 
 \mydiag{manifesto}{Reactive properties}
 
@@ -257,7 +257,7 @@ Figure \ref{fig:heterogen} illustrates a simple example of a robot application p
 
 \thesissubsection{Extensible}
 
-As the work described in this thesis is quite fundamental and ambitious, it seemed highly unlikely that it would reach closure within the context of an undergraduate thesis. Therefore, careful consideration was taken to compose the system of different independent modules, which could easily be extended or modified, in order to allow many future contributions.
+As the work described in this thesis is quite fundamental and ambitious, it seemed highly unlikely that it would reach closure within the context of an undergraduate thesis. Therefore, careful consideration was taken to compose the system of different independent modules, which could easily be extended/modified, allowing many future contributions.
 
 With that concept in mind, generality and abstraction were heavily emphasized during both the design and the implementation process. We can say now we are satisfied with the level of abstraction the core system has reached and hope the stressful refactoring that the framework went through will blossom in the form of future contributions.
 
@@ -266,38 +266,45 @@ With that concept in mind, generality and abstraction were heavily emphasized du
 The framework is \textit{abstract} in terms of implementation details, as it is completely agnostic of any machine-specific requirements. It is designed as a unifying conceptual base for further extensions and careful consideration was taken not to restrict in any aspect, architectural or not. This was achieved by making many parts of the core system pluggable, allowing for easy refactoring on most of its internal functionality. Moreover, the internal graph representation does not include information on how a node is executed, but only on its semantics.
 
 \thesissection{Approach}
+This chapter presents the framework's main characteristics and capabilities.
+
+\thesissubsection{System architecture}
+The \textit{RHEA} ecosystem consists of several clearly separated modules, whose interconnection is illustrated in figure \ref{fig:architecture}.
+
+\myimage{architecture}{0.5}{System architecture}
+
+The user writes a program in the provided stream language, which constructs a dataflow graph internally. Afterwards, using information about the available resources in the network, the constructed graph is optimized (i.e. in terms of performance, communication cost and node placement). The optimized graph is then distributed across the available machines for evaluation, maybe using a different technique each time.
+
+The following subsections will present the aforementioned stream language, while the other components, namely \textit{optimization, distribution, evaluation, serialization and network profiling}, will be discussed in chapter 5.
+
+\thesissubsection{Stream language}
+
+\thesissubsubsection{The Stream data type}
+
+The construction of the aforementioned internal graph is always implicit, through a rich set of stream operators. The only data type handled by the programmer is \textit{org.rhea\_core.Stream}, which contains the parametric type of its single output. Each \textit{Stream} object contains internally a \textit{FlowGraph}, which is only to be accessed and manipulated by the internal module, evaluation strategies and optimizers.
+
+Figure \ref{fig:simple} illustrates the dataflow graph(left) produced by the framework code(right) using the \textit{Stream} data type.
+
+\codefig{simple}{\jv{code/simple.java}}{Simple stream example}
+
+These variables can be used, preferably together with their parametric type, and reused in different parts of the graph. This is necessary, for instance, when you wish to split a node's output to different inputs. Figure \ref{fig:split} shows such an example.
+
+\codefig{split}{\jv{code/split.java}}{Split example}
+
+\thesissubsubsection{Syntax}
+
+\thesissubsubsection{Supported dataflow graphs}
+
+\thesissubsubsection{Execution semantics}
+
+\thesissubsubsection{Main operators}
+
 
 \thesissection{Implementation}
-This section examines the major characteristics of the framework's implementation.
-
-\thesissubsection{The Strategy design pattern}
-
-In software engineering, and especially in \textit{object-oriented programming (OOP)}, a \textit{design pattern} is a general repeatable solution to a commonly occurring problem in software design \cite{design}.
-
-One such solution, the \textit{Strategy} design pattern is used when a particular algorithm can be implemented by a variety of behaviours/classes \cite{design}. In such a case, a good idea is to isolate the algorithm in a separate \textit{interface} and allow the system to select the appropriate instantiating classes at runtime.
-
-Figure \ref{fig:strategy} illustrates the basic UML diagram of the strategy design pattern.
-
-\begin{figure}[h!] 
-	\centering
-	\includegraphics[scale=0.1]{strategy}
-  	\caption{Strategy design pattern}
-  	\label{fig:strategy}
-\end{figure}
-
-\thesissubsection{Notifications}
-Every value passed through the framework's \textit{streams} is wrapped inside a \textit{Notification} object, which discriminated stream values into three categories: \textit{onNext} (when the stream provides a regular value), \textit{onError} (when an error occurs) and \textit{onComplete} (when the stream completes its output).
-
-\thesissubsection{External Input-Output}
-In order to make the framework easy to integrate with other stream and/or dataflow technologies, I decided that every input/output node (i.e. publisher/subscriber in the \textit{PubSub} terminology or source/sink in the dataflow terminology) should implement the interfaces that \textit{RSS} defines.
-
-A sink node (output) should implement the Subscriber interface \site{http://www.reactive-streams.org/reactive-streams-1.0.0-javadoc/org/reactivestreams/Subscriber.html}, which essentially defines three methods corresponding to reactions to a \textit{Notification}, one for each of the categories mentioned above. 
-
-A source node (input) should implement the Publisher interface\site{http://www.reactive-streams.org/reactive-streams-1.0.0-javadoc/org/reactivestreams/Publisher.html}, which defines a single method \textit{subscribe(Subscriber)}, where a Subscriber requests the Publisher to start emitting values. 
-
-Many existing technologies provide these interfaces, or at least adapters from their internal representations, and therefore they are very easy to be integrated to the framework.
+This chapter delves deeper into the system's implementation details. 
 
 \thesissubsection{Software structure}
+
 The core system\site{https://github.com/rhea-flow/rhea-core} is organized in the following top-level packages:
 
 \begin{tabularx}{\textwidth}{rX}
@@ -321,19 +328,29 @@ The core system\site{https://github.com/rhea-flow/rhea-core} is organized in the
 
 For representing the internal structure of the dataflow graph, the \textit{JGrapht} open-source Java library was used, which provides many graph data structures and common graph-theory algorithms\cite{jgraph}. The main class representing the internal dataflow graph is \textit{FlowGraph},  which is located in the \textit{org.rhea\_core.internal} package.
 
-\thesissubsection{Stream variables}
+\thesissubsection{The Strategy design pattern}
 
-The construction of the aforementioned internal graph is always implicit, through a rich set of stream operators. The only data type handled by the programmer is \textit{org.rhea\_core.Stream}, which contains the parametric type of its single output. Each \textit{Stream} object contains internally a \textit{FlowGraph}, which is only to be accessed and manipulated by the internal module, evaluation strategies and optimizers.
+In software engineering, and especially in \textit{object-oriented programming (OOP)}, a \textit{design pattern} is a general repeatable solution to a commonly occurring problem in software design \cite{design}.
 
-Figure \ref{fig:simple} illustrates the dataflow graph(left) produced by the framework code(right) using the \textit{Stream} data type.
+One such solution, the \textit{Strategy} design pattern is used when a particular algorithm can be implemented by a variety of behaviours/classes \cite{design}. In such a case, a good idea is to isolate the algorithm in a separate \textit{interface} and allow the system to select the appropriate instantiating classes at runtime.
 
-\codefig{simple}{\jv{code/simple.java}}{Simple stream example}
+Figure \ref{fig:strategy} illustrates the basic UML diagram of the strategy design pattern.
 
-These variables can be used, preferably together with their parametric type, and reused in different parts of the graph. This is necessary, for instance, when you wish to split a node's output to different inputs. Figure \ref{fig:split} shows such an example.
+To make the system as extensible as possible, most individual critical components are defined using the strategy design pattern (e.g. EvaluationStrategy, DistributionStrategy, etc...) and the current implementation offers one or more default concrete strategies for each one.
 
-\codefig{split}{\jv{code/split.java}}{Split example}
+\myimage{strategy}{0.1}{Strategy design pattern}
 
-\thesissubsection{Stream operators}
+\thesissubsection{Notifications}
+Every value passed through the framework's \textit{streams} is wrapped inside a \textit{Notification} object, which discriminates stream values into three categories: \textit{onNext} (when the stream provides a regular value), \textit{onError} (when an error occurs) and \textit{onComplete} (when the stream completes its output).
+
+\thesissubsection{External Input-Output}
+In order to make the framework easy to integrate with other stream and/or dataflow technologies, every input/output node (i.e. publisher/subscriber in the \textit{PubSub} terminology or source/sink in the dataflow terminology) should implement the interfaces that \textit{RSS} defines. This also enables users to define new types of sources or sinks, in order to integrate the framework with other general technologies (e.g. system events, HTTP requests, PubSub implementations, etc).
+
+A sink node (output) should implement the Subscriber interface\site{http://www.reactive-streams.org/reactive-streams-1.0.0-javadoc/org/reactivestreams/Subscriber.html}, which essentially defines three methods corresponding to reactions to a \textit{Notification}, one for each of the categories mentioned above. 
+
+A source node (input) should implement the Publisher interface\site{http://www.reactive-streams.org/reactive-streams-1.0.0-javadoc/org/reactivestreams/Publisher.html}, which defines a single method \textit{subscribe(Subscriber)}, where a Subscriber requests the Publisher to start emitting values. 
+
+Many existing technologies provide these interfaces, or at least adapters from their internal representations, and therefore they are very easy to be integrated to the framework.
 
 \thesissubsection{Evaluation}
 
@@ -364,7 +381,7 @@ For distribution and cluster management, the strategy design pattern is used aga
 
 \thesissubsubsection{Hazelcast}
 
-Due to the RSS being in its infant stage, no working implementation exists for superimposing a network protocol onto it (e.g. RSS over TCP). For this reason, I relied upon the open-source \textit{Hazelcast} library\cite{hazelcast} to discover and manage multiple machines and used its internal decentralized \textit{PubSub} model to communicate intermediate results across the network. Figure \ref{fig:partition1} illustrates a dataflow graph on the left and the same graph partitioned over several machines on the right.
+Due to the RSS being in its infant stage, no formal specification, for superimposing a network protocol onto it (e.g. RSS over TCP), exists yet. For this reason, I relied upon the open-source \textit{Hazelcast} library\cite{hazelcast} to discover and manage multiple machines and used its internal decentralized \textit{PubSub} model to communicate intermediate results across the network. Figure \ref{fig:partition1} illustrates a dataflow graph on the left and the same graph partitioned over several machines on the right, where each machine, except the last one, outputs its result to a \textit{Hazelcast} topic, from which another machine gets its input. \textit{Hazelcast} topics can immediately be used as inputs and outputs, as they implement both the \textit{Subscriber} and \textit{Publisher} interface.
 
 \twofig{partition1}{partition2}{Partitioning}
 
