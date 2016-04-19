@@ -18,7 +18,7 @@
 \definecolor{myrd}{HTML}{B60005}
 \definecolor{mybl}{HTML}{00706C}\definecolor{mygr}{HTML}{079500}
 \definecolor{mybr}{HTML}{B85200}
-\colorlet{myye}{yellow!20}
+\colorlet{myye}{yellow!40}
 
 % Images
 \usepackage{multicol}
@@ -65,7 +65,9 @@
 
 \begin{thesisabstract}[Abstract]
 
-The dataflow computational model enables writing highly parallel programs, which will be deployed on a heterogeneous network, in a concise and readable way. The main advantage is the fact that the system can be conceptually separated into several independent components that can be run in parallel and deployed on different machines. Therefore, concurrency and distribution is implicit and little or no responsibility is given to the programmer. The framework proposed in this thesis constitutes the underlying system that make this style of programming possible in JVM-based languages (e.g. Java, Scala, Closure), while at the same time making it easy to integrate other technologies that rely on the PubSub model, in order to move away from imperative languages and enter a higher level of abstraction. Particular emphasis was put on three domains, namely \textit{Big Data}, \textit{Robotics} and \textit{IoT}. A detailed specification of the framework's characteristics and capabilities is given, followed by some robotic applications that demonstrate these attributes. Finally, related work and recent technologies are discussed.
+The dataflow computational model enables writing highly parallel programs, which will be deployed on a heterogeneous network, in a concise and readable way. The main advantage is the fact that the system can be conceptually separated into several independent components that can be run in parallel and deployed on different machines. Therefore, concurrency and distribution is implicit and little or no responsibility is given to the programmer. The framework proposed in this thesis constitutes the underlying system that make this style of programming possible in JVM-based languages (e.g. Java, Scala, Closure), while at the same time making it easy to integrate other technologies that rely on the PubSub model, in order to move away from imperative languages and enter a higher level of abstraction. Particular emphasis was put on three domains, namely \textit{Big Data}, \textit{Robotics} and \textit{IoT}.
+
+%A detailed specification of the framework's characteristics and capabilities is given, followed by some robotic applications that demonstrate these attributes. Finally, related work and recent technologies are discussed.
 
 \thesiskeywords
 {Subject Area}{Programming Languages}
@@ -112,9 +114,7 @@ My main contribution is the design and implementation of a framework for dataflo
 
 The main idea is to provide the programmer with a different execution model, the dataflow model, which allows for a more abstract way of thinking and has the advantage of exposing opportunities for parallelism (amongst CPU cores) and distribution (amongst computational machines), which can then be automatically realised by the "intelligent" underlying system. 
 
-Therefore, the programmer will be able to utilize available computational resources without any effort, while at the same time reducing development time/cost and maintaining a much cleaner and easier-to-refactor software system. Resource utilization may appear in the form of faster execution or more robust error-handling. 
-
-\todo[inline,linecolor=red,backgroundcolor=red!25,bordercolor=red]{Chain of Gain. Introduce running example?}
+Therefore, the programmer will be able to utilize available computational resources without any effort, while at the same time reducing development time/cost and maintaining a much cleaner and easier-to-refactor software system. Resource utilization may appear in the form of faster execution (i.e. by concurrently doing computations on multiple machines) or more robust error-handling (i.e. by using backup machines to rerun nodes that were hosted on a faulty machine). 
 
 \thesissubsection{Motivation}
 
@@ -277,28 +277,56 @@ The user writes a program in the provided stream language, which constructs a da
 
 The following subsections will present the aforementioned stream language, while the other components, namely \textit{optimization, distribution, evaluation, serialization and network profiling}, will be discussed in chapter 5.
 
+\thesissubsection{Supported dataflow graphs}
+
+The kind of dataflow graph that can be expressed using the framework's stream language are directed cyclic graphs with possibly many inputs and outputs. Figure \ref{fig:graph} depicts such a graph, where inputs and outputs are colored red and green respectively.
+
+\mydiag{graph}{Example of supported graph}
+
 \thesissubsection{Stream language}
+This section presents the framework's language for defining streams and executing them. In the examples that will be demonstrated, only a very small subset of the provided operators will be presented. See the appendix for the complete set of the primitive operators, from which the whole set can be derived (i.e. by combining them).
 
 \thesissubsubsection{The Stream data type}
 
-The construction of the aforementioned internal graph is always implicit, through a rich set of stream operators. The only data type handled by the programmer is \textit{org.rhea\_core.Stream}, which contains the parametric type of its single output. Each \textit{Stream} object contains internally a \textit{FlowGraph}, which is only to be accessed and manipulated by the internal module, evaluation strategies and optimizers.
+The data channels (i.e. edges of the dataflow graph) are represented using the \textit{Stream} data type, which is parametric, meaning that it can emit values of any data type, whether built-in or user-defined. The stream produced may terminate, successfully or erroneously, or even be infinite.
 
-Figure \ref{fig:simple} illustrates the dataflow graph(left) produced by the framework code(right) using the \textit{Stream} data type.
+\thesissubsubsection{Graph construction syntax}
 
-\codefig{simple}{\jv{code/simple.java}}{Simple stream example}
+The construction of the internal dataflow graph is always implicit, through a rich set of operators on the Stream data type. Each \textit{Stream} object contains internally a dataflow graph of type \textit{FlowGraph}, which is only to be accessed and manipulated by the internal module, evaluation strategies and optimizers. Therefore, an application developer only needs to work with the \textit{Stream} type.
 
-These variables can be used, preferably together with their parametric type, and reused in different parts of the graph. This is necessary, for instance, when you wish to split a node's output to different inputs. Figure \ref{fig:split} shows such an example.
+Source nodes are constructed using built-in functions of type \textit{Stream}. For instance, \textit{Stream.just(1, 2, 3)} produces the stream that emits just the values 1, 2 and 3. The return variable of these creation function is an object of type \textit{Stream}.
+
+Processing nodes can be divided into two classes: \textit{single input} ones and \textit{multiple input} ones. 
+
+\textit{Single input} nodes are inserted into an existing Stream object, by calling an operator on that object. Figure \ref{fig:singleinput} shows an example of a single input node, namely that of \textit{map}, which transforms the input stream (i.e. just the values 1, 2 and 3) by applying a user-defined function to every emitted value (i.e. $f(x)=x+1$).
+
+\codefig{singleinput}{\jv{code/singleinput.java}}{Single input processing node}
+
+\textit{Multiple input} nodes are constructed by built-in function that take as argument already existing Stream objects. Figure \ref{fig:multipleinput} shows an example of a multiple input node, namely that of \textit{zip}, which transforms the input streams (i.e. two stream that emit the values 1..10) by applying a user-defined function to each emitted pairs of values (i.e. $f(x,y)=x+y$). Here we also see another stream creation function, namely \textit{Stream.range}.
+
+\codefig{multipleinput}{\jv{code/multipleinput.java}}{Multiple input processing node}
+
+The variables returns by all processing nodes are \textit{Stream} objects. These objects can be reused in different parts of the graph to enable splitting a node's output to different processing nodes or outputs. Figure \ref{fig:split} shows such an example, where the \textit{filter} operator only emits values for which the given function returns true.
 
 \codefig{split}{\jv{code/split.java}}{Split example}
 
-\thesissubsubsection{Syntax}
+Cycle construction is a bit trickier, as no direct manipulation of the internal graph is permitted. Cycles are constructed using the \textit{loop} operator, which is a single input processing node. It requires a function that, given an input stream, constructs a subgraph that redirects its output to that input, therefore creating a feedback loop. Figure \ref{fig:natt} shows an example of the \textit{loop} operator to represent the natural numbers, just as the graph shown earlier in figure \ref{fig:nat}. The \textit{concat} operator is a multiple input node that concatenates its input streams.
 
-\thesissubsubsection{Supported dataflow graphs}
+\codefig{natt}{\jv{code/natt.java}}{Cyclic example}
+
+\thesissubsubsection{Evaluation syntax}
+
+To evaluate a given dataflow graph and do something with its output values, we need to call the \textit{subscribe} method of the \textit{Stream} object. The argument passed to \textit{subscribe} is either a user-defined action (i.e. function with side-effects) or an object implementing the \textit{Subscriber} interface (see section \ref{external}). Figure \ref{fig:subexample} shows an example of printing the output of the single-input example in figure \ref{fig:singleinput}.
+
+\codefig{subexample}{\jv{code/subexample.java}}{Evaluation example}
 
 \thesissubsubsection{Execution semantics}
 
-\thesissubsubsection{Main operators}
+As the execution is completely asynchronous, the order of stream declaration and/or evaluation does not matter at all. If there is absolute necessity for control flow management, the programmer can use the altered \textit{BlockingStream} type that blocks program execution to next \textit{subscribes} until the currently subscribed streams terminate successfully. 
 
+Nonetheless, this utility is helpful for rapid prototyping and testing purposes. The source code below shows an example of accumulating the 10 first natural numbers in a list and printing that list. 
+
+\jv{code/block.java}
 
 \thesissection{Implementation}
 This chapter delves deeper into the system's implementation details. 
@@ -343,12 +371,12 @@ To make the system as extensible as possible, most individual critical component
 \thesissubsection{Notifications}
 Every value passed through the framework's \textit{streams} is wrapped inside a \textit{Notification} object, which discriminates stream values into three categories: \textit{onNext} (when the stream provides a regular value), \textit{onError} (when an error occurs) and \textit{onComplete} (when the stream completes its output).
 
-\thesissubsection{External Input-Output}
-In order to make the framework easy to integrate with other stream and/or dataflow technologies, every input/output node (i.e. publisher/subscriber in the \textit{PubSub} terminology or source/sink in the dataflow terminology) should implement the interfaces that \textit{RSS} defines. This also enables users to define new types of sources or sinks, in order to integrate the framework with other general technologies (e.g. system events, HTTP requests, PubSub implementations, etc).
+\thesissubsection{External Input-Output} \label{external}
+In order to make the framework easy to integrate with other stream and/or dataflow technologies, every input/output node (i.e. publisher/subscriber in the \textit{PubSub} terminology or source/sink in the dataflow terminology) should implement the interfaces that \textit{RSS} defines\site{http://www.reactive-streams.org/reactive-streams-1.0.0-javadoc/org/reactivestreams/}. This also enables users to define new types of sources or sinks, in order to integrate the framework with other general technologies (e.g. system events, HTTP requests, PubSub implementations, etc).
 
-A sink node (output) should implement the Subscriber interface\site{http://www.reactive-streams.org/reactive-streams-1.0.0-javadoc/org/reactivestreams/Subscriber.html}, which essentially defines three methods corresponding to reactions to a \textit{Notification}, one for each of the categories mentioned above. 
+A sink node (output) should implement the Subscriber interface, which essentially defines three methods corresponding to reactions to a \textit{Notification}, one for each of the categories mentioned above. 
 
-A source node (input) should implement the Publisher interface\site{http://www.reactive-streams.org/reactive-streams-1.0.0-javadoc/org/reactivestreams/Publisher.html}, which defines a single method \textit{subscribe(Subscriber)}, where a Subscriber requests the Publisher to start emitting values. 
+A source node (input) should implement the Publisher interface, which defines a single method \textit{subscribe(Subscriber)}, where a Subscriber requests the Publisher to start emitting values. 
 
 Many existing technologies provide these interfaces, or at least adapters from their internal representations, and therefore they are very easy to be integrated to the framework.
 
@@ -360,16 +388,16 @@ A complete dataflow is defined by a \textit{Stream} variable and an object imple
 
 In order to evaluate a constructed dataflow graph the strategy design pattern is used, therefore a class implementing the \textit{EvaluationStrategy} interface, found in the \textit{org.rhea\_core.evaluation} package, needs to be provided. An \textit{EvaluationStrategy} just takes the \textit{Stream} variable and its corresponding \textit{Output} and executes it, however desired.
 
-The strategies I have implemented so far follow:
+The strategies I have implemented so far\cite{rhea} follow:
 
 \begin{description}[style=nextline]
-\item[RxJavaEvaluationStrategy\site{https://github.com/rhea-flow/rx-eval}] 
+\item[RxJavaEvaluationStrategy] 
 Uses rxjava\site{https://github.com/ReactiveX/RxJava}, which is a famous and well-maintained library for asynchronous programming using the \textit{Observable} type, which is very close, semantically, to my \textit{Stream} type.
 
-\item[RosEvaluationStrategy\site{https://github.com/rhea-flow/ros-eval}] 
+\item[RosEvaluationStrategy] 
 Integrates the \textit{ROS} middleware into the framework, by providing the \textit{RosTopic} class, which implements the \textit{AbstractTopic} interface defined in the \textit{org.rhea\_core.io} package. This strategy's job is to set up a \textit{ROS} client and configure every \textit{RosTopic} used within the dataflow that needs to be evaluated to use this client. After that, evaluation is propagated to a generic strategy (e.g. rxjava).
 
-\item[MqttEvaluationStrategy\site{https://github.com/rhea-flow/mqtt-eval}] 
+\item[MqttEvaluationStrategy] 
 Integrates the MQTT middleware into the framework, in the same way \textit{ROS} is intergrated.
 \end{description}
 

@@ -2,11 +2,9 @@
   [every matrix/.append style={column sep=1cm, row sep=0.5cm}]
   \matrix{
     \node[dataflow] (fst) {\small 1..10}; \\
-    \& \node[dataflow] (zip) {\small zip(+)};  
-    \& \node[dataflow] (out) {\small 2,4,6,8...}; \\
+    \& \node[dataflow] (zip) {\small zip \{$x+y$\}};  \\
     \node[dataflow] (snd) {\small 1..10}; \\
   };
   \draw[to] (fst) -- (zip);
   \draw[to] (snd) -- (zip);
-  \draw[to] (zip) -- (out);  
 \end{tikzpicture} 
